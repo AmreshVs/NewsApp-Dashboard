@@ -1,11 +1,14 @@
 import axios from 'axios';
 import { API_URL } from '../constants/index';
 
-const Auth = async (data) => {
+const GetPost = async (id, token) => {  
+console.log(API_URL + '/get-post/' + id)
   return await axios({
-    method: 'POST',
-    url: API_URL + '/alogin',
-    data: data
+    method: 'GET',
+    url: API_URL + '/get-post?id=' + id,
+    headers: {
+      'Authorization': token,
+    },
   })
   .then(function (response) {
     return response.data;
@@ -15,4 +18,4 @@ const Auth = async (data) => {
   });
 }
 
-export default Auth;
+export default GetPost;

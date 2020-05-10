@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -11,6 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
@@ -24,8 +27,9 @@ import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 
 import style from './style';
 import DashNavigation from '../../components/dashNavigation/index';
+import { toggleTheme } from '../../redux/actions/commonActions';
 
-export default function Dashboard() {
+const Dashboard = (props) => {
   const classes = style();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -44,6 +48,10 @@ export default function Dashboard() {
     localStorage.removeItem('userData');
     history.push('/login');
   };
+
+  const handleTheme = () => {
+    props.toggleTheme(props.theme === 'light' ? 'dark' : 'light');
+  }
 
   return (
     <div className={classes.root}>
@@ -69,7 +77,12 @@ export default function Dashboard() {
           <Typography variant="h6" className={classes.title}>
             Valar Tamil
           </Typography>
-          <Tooltip title="Logout" aria-label="Logout">
+          <Tooltip title="Toggle Theme" aria-label="toggle-theme">
+            <IconButton color="inherit" aria-label="menu" onClick={handleTheme}>
+              <Brightness4Icon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Logout" aria-label="logout">
             <IconButton color="inherit" aria-label="menu" onClick={logout}>
               <PowerSettingsNewIcon />
             </IconButton>
@@ -125,3 +138,12 @@ export default function Dashboard() {
     </div>
   );
 }
+
+const mapStateToProps = (state) => {
+  return state.common;
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({toggleTheme: toggleTheme}, dispatch);
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

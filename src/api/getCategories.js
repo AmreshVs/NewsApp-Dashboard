@@ -1,18 +1,20 @@
 import axios from 'axios';
 import { API_URL } from '../constants/index';
 
-const Auth = async (data) => {
+const GetCategories = async (token) => {  
   return await axios({
-    method: 'POST',
-    url: API_URL + '/alogin',
-    data: data
+    method: 'GET',
+    url: API_URL + '/categories',
+    headers: {
+      'Authorization': token
+    }
   })
   .then(function (response) {
-    return response.data;
+    return response.data.data;
   })
   .catch(function (error) {
     return error.response.data;
   });
 }
 
-export default Auth;
+export default GetCategories;

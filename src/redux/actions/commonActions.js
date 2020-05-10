@@ -1,4 +1,4 @@
-import { USER_LOGIN, SNACKBAR_MESSAGE } from '../actionCreators/commonAC';
+import { USER_LOGIN, SNACKBAR_MESSAGE, TOGGLE_THEME } from '../actionCreators/commonAC';
 
 export const userLogin = (payload) => {
   return {
@@ -13,3 +13,10 @@ export const snackMessage = (payload) => {
     payload
   };
 };
+
+export const toggleTheme = (payload) => {
+  return {
+    type: TOGGLE_THEME,
+    payload
+  }
+} 

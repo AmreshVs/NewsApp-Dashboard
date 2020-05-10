@@ -1,9 +1,10 @@
 import { API_URL } from '../constants/index';
 
 export default class ImageUploadAdapter {
-  constructor(loader) {
+  constructor(loader, token) {
     // The file loader instance to use during the upload.
     this.loader = loader;
+    this.token = token;
   }
 
   _initRequest() {
@@ -42,7 +43,7 @@ export default class ImageUploadAdapter {
       // This URL will be used to display the image in the content. Learn more in the
       // UploadAdapter#upload documentation.
       resolve({
-        default: response.url
+        default: API_URL + response.url
       });
     });
 
@@ -70,6 +71,7 @@ export default class ImageUploadAdapter {
     // XMLHttpRequest.setRequestHeader() to set the request headers containing
     // the CSRF token generated earlier by your application.
 
+    this.xhr.setRequestHeader('Authorization', this.token);
     // Send the request.
     this.xhr.send(data);
   }

@@ -5,19 +5,18 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 import useStyles from './style';
 import SnackMessage from '../../commonFunctions/SnackMessage';
-import Auth from '../../commonFunctions/Auth';
+import ASignup from '../../commonFunctions/signup';
 import { userLogin } from '../../redux/actions/commonActions';
 
 function Copyright() {
@@ -34,29 +33,24 @@ function Copyright() {
   );
 }
 
-const Login = (props) => {
+const Signup = (props) => {
 
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
-  const [username, setUsername] = React.useState('amresh');
-  const [pass, setPass] = React.useState('amresh');
-  const [checked, setChecked] = React.useState(true);
+  const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [pass, setPass] = React.useState('');
+  const [repass, setRepass] = React.useState('');
 
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-  };
 
   const handleButtonClick = async () => {
     if(validate()){
       setLoading(true);
-      const response = await Auth({username: username, pass: pass});
+      const response = await ASignup({username: username, email: email, pass: pass});
+      console.log(response)
       SnackMessage({status: response.status, msg: response.message});
       if(response.status === 200){
-        if(checked){
-          localStorage.setItem('userData', JSON.stringify(response.data));
-        }
-        props.userLogin(response.data);
-        props.history.replace('/dashboard');
+        props.history.replace('/login');
       }
       setLoading(false);
     }
@@ -69,8 +63,23 @@ const Login = (props) => {
       return false;
     }
 
+    if(!email){
+      SnackMessage({status: 'error', msg: 'Email cannot be blank'});
+      return false;
+    }
+
     if(!pass){
       SnackMessage({status: 'error', msg: 'Password cannot be blank'});
+      return false;
+    }
+
+    if(!repass){
+      SnackMessage({status: 'error', msg: 'Retype Password cannot be blank'});
+      return false;
+    }
+
+    if(pass !== repass){
+      SnackMessage({status: 'error', msg: 'Passwords are not same'});
       return false;
     }
 
@@ -87,35 +96,19 @@ const Login = (props) => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign Up
           </Typography>
           <form className={classes.form} noValidate>
             <TextField value={username} onChange={(e) => setUsername(e.target.value)} variant="outlined" margin="normal" required fullWidth id="username" label="Username" name="username" autoComplete="username" autoFocus />
+            <TextField value={email} onChange={(e) => setEmail(e.target.value)} variant="outlined" margin="normal" required fullWidth name="email" label="Email" type="email" id="email" autoComplete="email" />
             <TextField value={pass} onChange={(e) => setPass(e.target.value)} variant="outlined" margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" />
-            <FormControlLabel
-              checked={checked}
-              onChange={handleChange}
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <TextField value={repass} onChange={(e) => setRepass(e.target.value)} variant="outlined" margin="normal" required fullWidth name="re-password" label="Retype Password" type="password" id="re-password" autoComplete="current-password" />
             <div className={classes.wrapper}>
               <Button fullWidth variant="contained" color="primary" className={classes.submit} disabled={loading} onClick={handleButtonClick} >
-                Sign In
+                Sign Up
               </Button>
               {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </div>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link to="/signup" variant="body2">
-                  Don't have an account? Sign Up
-                </Link>
-              </Grid>
-            </Grid>
             <Box mt={5}>
               <Copyright />
             </Box>
@@ -134,4 +127,4 @@ const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({userLogin: userLogin}, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Login));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Signup));

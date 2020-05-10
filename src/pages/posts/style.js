@@ -26,7 +26,14 @@ const style = makeStyles((theme) => ({
   },
   image:{
     width: '100%',
-    maxHeight: 400
+    maxHeight: 400,
+    borderRadius: 5
+  },
+  button:{
+    width: '100%'
+  },
+  expansion:{
+    display: 'block'
   }
 }));
 

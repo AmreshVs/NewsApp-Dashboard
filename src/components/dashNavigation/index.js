@@ -4,6 +4,7 @@ import { Switch, Route, useRouteMatch } from "react-router-dom";
 import Summary from '../../pages/dashboard/summary';
 import NewPost from '../../pages/posts/newPost';
 import AllPost from '../../pages/posts/allPost';
+import EditPost from '../../pages/posts/editPost';
 
 const DashNavigation = () => {
   let { path } = useRouteMatch();
@@ -17,6 +18,9 @@ const DashNavigation = () => {
       </Route>
       <Route path={`${path}/all-post`}>
         <AllPost/>
+      </Route>
+      <Route path={`${path}/edit-post/:post_id`}>
+        <EditPost/>
       </Route>
     </Switch>
   )
