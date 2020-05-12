@@ -72,10 +72,10 @@ const NewPost = (props) => {
   }, [props.userData.token])
 
   const handleBrandsCheck = (id) => {
-    if(!brandsChecked.includes(id)){
+    if (!brandsChecked.includes(id)) {
       setBrandsChecked([...brandsChecked, id]);
     }
-    else{
+    else {
       let index = brandsChecked.indexOf(id);
       let newBrands = [...brandsChecked];
       newBrands.splice(index, 1);
@@ -84,17 +84,17 @@ const NewPost = (props) => {
   }
 
   const handleCategoriesCheck = (id) => {
-    if(!categoriesChecked.includes(id)){
+    if (!categoriesChecked.includes(id)) {
       setCategoriesChecked([...categoriesChecked, id]);
     }
-    else{
+    else {
       let index = categoriesChecked.indexOf(id);
       let newCategories = [...categoriesChecked];
       newCategories.splice(index, 1);
       setCategoriesChecked(newCategories);
     }
   }
-  
+
   const handleFileInput = async (image) => {
     setImageFlag(true);
     const response = await ImageUpload(image, props.userData.token);
@@ -102,28 +102,28 @@ const NewPost = (props) => {
   }
 
   const validateData = () => {
-    if(!title){
-      SnackMessage({status: 401, msg: 'Title cannot be empty'});
+    if (!title) {
+      SnackMessage({ status: 401, msg: 'Title cannot be empty' });
       return false;
     }
 
-    if(!content){
-      SnackMessage({status: 401, msg: 'Content cannot be empty'});
+    if (!content) {
+      SnackMessage({ status: 401, msg: 'Content cannot be empty' });
       return false;
     }
 
-    if(!imageFlag){
-      SnackMessage({status: 401, msg: 'Image cannot be empty'});
+    if (!imageFlag) {
+      SnackMessage({ status: 401, msg: 'Image cannot be empty' });
       return false;
     }
 
-    if(brandsChecked.length <= 0){
-      SnackMessage({status: 401, msg: 'Brands cannot be empty'});
+    if (brandsChecked.length <= 0) {
+      SnackMessage({ status: 401, msg: 'Brands cannot be empty' });
       return false;
     }
 
-    if(categoriesChecked.length <= 0){
-      SnackMessage({status: 401, msg: 'Brands cannot be empty'});
+    if (categoriesChecked.length <= 0) {
+      SnackMessage({ status: 401, msg: 'Brands cannot be empty' });
       return false;
     }
 
@@ -131,10 +131,10 @@ const NewPost = (props) => {
   }
 
   const handleSubmit = async () => {
-    if(validateData()){
+    if (validateData()) {
       let data = { title: title, content: content, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
       const response = await CreatePost(data, props.userData.token);
-      SnackMessage({status: response.status, msg: response.message});
+      SnackMessage({ status: response.status, msg: response.message });
       history.replace('/dashboard/all-post');
     }
   }
@@ -216,16 +216,17 @@ const NewPost = (props) => {
             <Grid item xs={12}>
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
-                <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  id="contained-button-file"
-                  ref={fileInput}
-                  onChange={(e) => handleFileInput(e.target.files[0])}
-                  type="file"
-                />
                 <label htmlFor="contained-button-file">
+                  <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
+                  <input
+                    accept="image/*"
+                    className={classes.input}
+                    id="contained-button-file"
+                    ref={fileInput}
+                    onChange={(e) => handleFileInput(e.target.files[0])}
+                    type="file"
+                  />
+
                   <Button
                     variant="contained"
                     color="primary"
@@ -274,13 +275,13 @@ const NewPost = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Finish</h3>
                 <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    component="span"
-                    onClick={handleSubmit}
-                    startIcon={<CheckIcon />}
-                  >
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  component="span"
+                  onClick={handleSubmit}
+                  startIcon={<CheckIcon />}
+                >
                   Submit Post
                 </Button>
               </Paper>

@@ -22,6 +22,7 @@ const style = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: 36,
+    marginLeft: -20
   },
   hide: {
     display: 'none',
@@ -46,7 +47,7 @@ const style = makeStyles((theme) => ({
     overflowX: 'hidden',
     width: theme.spacing(7) + 1,
     [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9) + 1,
+      width: theme.spacing(7) + 4,
     },
   },
   toolbar: {

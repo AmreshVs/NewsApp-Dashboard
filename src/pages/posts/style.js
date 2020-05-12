@@ -27,13 +27,61 @@ const style = makeStyles((theme) => ({
   image:{
     width: '100%',
     maxHeight: 400,
-    borderRadius: 5
+    borderRadius: 5,
+    cursor: 'pointer'
+  },
+  postsimage:{
+    width: '100%',
+    borderRadius: 5,
+    maxHeight: 70
   },
   button:{
     width: '100%'
   },
   expansion:{
     display: 'block'
+  },
+  chips:{
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    }
+  },
+  actionButtons:{
+    '& > *': {
+      margin: theme.spacing(0.5),
+    }
+  },
+  tableHeading:{
+    fontWeight: 600
+  },
+  tableCell:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  divider:{
+    margin: '10px 0px'
+  },
+  formControl:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  pageSize:{
+    paddingRight: 10
+  },
+  commentBox:{
+    width: '100%'
+  },
+  commentHeading:{
+    marginBottom: 10
+  },
+  commentsContainer:{
+    marginTop: 20
   }
 }));
 

@@ -6,7 +6,6 @@ import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
@@ -16,7 +15,6 @@ import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import PostAddIcon from '@material-ui/icons/PostAdd';
@@ -24,6 +22,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import ViewStreamIcon from '@material-ui/icons/ViewStream';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Link, useHistory, useRouteMatch } from 'react-router-dom';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import style from './style';
 import DashNavigation from '../../components/dashNavigation/index';
@@ -108,32 +108,32 @@ const Dashboard = (props) => {
           </IconButton>
         </div>
         <Divider />
-        <List>
-          <Link to={`${url}`}>
-            <ListItem button key={'Home'}>
+        <MenuList>
+          <Tooltip title={open === false ? 'Home' : ''} aria-label="home" placement="right">
+            <MenuItem component={Link} to={`${url}`}>
               <ListItemIcon><HomeIcon /></ListItemIcon>
               <ListItemText primary={'Home'} />
-            </ListItem>
-          </Link>
+            </MenuItem>
+          </Tooltip>
           <Divider />
-          <Link to={`${url}/new-post`}>
-            <ListItem button key={'New Post'}>
+          <Tooltip title={open === false ? 'New Post' : ''} aria-label="New Post" placement="right">
+            <MenuItem component={Link} to={`${url}/new-post`}>
               <ListItemIcon><PostAddIcon /></ListItemIcon>
               <ListItemText primary={'New Post'} />
-            </ListItem>
-          </Link>
-          <Link to={`${url}/all-post`}>
-            <ListItem button key={'All Post'}>
+            </MenuItem>
+          </Tooltip>
+          <Tooltip title={open === false ? 'All Post' : ''} aria-label="All Post" placement="right">
+            <MenuItem component={Link} to={`${url}/all-post`}>
               <ListItemIcon><ViewStreamIcon /></ListItemIcon>
               <ListItemText primary={'All Post'} />
-            </ListItem>
-          </Link>
-        </List>
+            </MenuItem>
+          </Tooltip>
+        </MenuList>
         <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <DashNavigation/>
+        <DashNavigation />
       </main>
     </div>
   );
@@ -144,6 +144,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({toggleTheme: toggleTheme}, dispatch);
+  return bindActionCreators({ toggleTheme: toggleTheme }, dispatch);
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

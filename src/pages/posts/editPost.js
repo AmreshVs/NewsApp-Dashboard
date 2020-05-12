@@ -10,8 +10,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
-import { useParams } from 'react-router-dom';
-import { API_URL } from '../../constants/index';
+import { useParams, useHistory } from 'react-router-dom';
 
 import CKEditor from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
@@ -46,9 +45,11 @@ import GetPost from '../../api/getPost';
 import GetCategories from '../../api/getCategories';
 import GetBrands from '../../api/getBrands';
 import SnackMessage from '../../commonFunctions/SnackMessage';
+import { API_URL } from '../../constants/index';
 
 const EditPost = (props) => {
 
+  const history = useHistory();
   const { post_id } = useParams();
   const classes = style();
   const [title, setTitle] = React.useState('');
@@ -94,10 +95,10 @@ const EditPost = (props) => {
   }
 
   const handleBrandsCheck = (id) => {
-    if(!brandsChecked.includes(id)){
+    if (!brandsChecked.includes(id)) {
       setBrandsChecked([...brandsChecked, id]);
     }
-    else{
+    else {
       let index = brandsChecked.indexOf(id);
       let newBrands = [...brandsChecked];
       newBrands.splice(index, 1);
@@ -106,40 +107,40 @@ const EditPost = (props) => {
   }
 
   const handleCategoriesCheck = (id) => {
-    if(!categoriesChecked.includes(id)){
+    if (!categoriesChecked.includes(id)) {
       setCategoriesChecked([...categoriesChecked, id]);
     }
-    else{
+    else {
       let index = categoriesChecked.indexOf(id);
       let newCategories = [...categoriesChecked];
       newCategories.splice(index, 1);
       setCategoriesChecked(newCategories);
     }
   }
-  
+
   const handleFileInput = async (image) => {
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
   }
 
   const validateData = () => {
-    if(!title){
-      SnackMessage({status: 401, msg: 'Title cannot be empty'});
+    if (!title) {
+      SnackMessage({ status: 401, msg: 'Title cannot be empty' });
       return false;
     }
 
-    if(!content){
-      SnackMessage({status: 401, msg: 'Content cannot be empty'});
+    if (!content) {
+      SnackMessage({ status: 401, msg: 'Content cannot be empty' });
       return false;
     }
 
-    if(brandsChecked.length <= 0){
-      SnackMessage({status: 401, msg: 'Brands cannot be empty'});
+    if (brandsChecked.length <= 0) {
+      SnackMessage({ status: 401, msg: 'Brands cannot be empty' });
       return false;
     }
 
-    if(categoriesChecked.length <= 0){
-      SnackMessage({status: 401, msg: 'Brands cannot be empty'});
+    if (categoriesChecked.length <= 0) {
+      SnackMessage({ status: 401, msg: 'Brands cannot be empty' });
       return false;
     }
 
@@ -147,10 +148,11 @@ const EditPost = (props) => {
   }
 
   const handleUpdate = async () => {
-    if(validateData()){
+    if (validateData()) {
       let data = { id: post_id, title: title, content: content, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
       const response = await CreatePost(data, props.userData.token);
-      SnackMessage({status: response.status, msg: response.message});
+      SnackMessage({ status: response.status, msg: response.message });
+      history.push('/dashboard/all-post');
     }
   }
 
@@ -231,16 +233,17 @@ const EditPost = (props) => {
             <Grid item xs={12}>
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
-                <img className={classes.image} src={title !== '' ? API_URL + image : image} alt="upload" />
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  id="contained-button-file"
-                  ref={fileInput}
-                  onChange={(e) => handleFileInput(e.target.files[0])}
-                  type="file"
-                />
                 <label htmlFor="contained-button-file">
+                  <img className={classes.image} src={title !== '' ? API_URL + image : image} alt="upload" />
+                  <input
+                    accept="image/*"
+                    className={classes.input}
+                    id="contained-button-file"
+                    ref={fileInput}
+                    onChange={(e) => handleFileInput(e.target.files[0])}
+                    type="file"
+                  />
+
                   <Button
                     variant="contained"
                     color="primary"
@@ -289,13 +292,13 @@ const EditPost = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Finish</h3>
                 <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    component="span"
-                    onClick={handleUpdate}
-                    startIcon={<CheckIcon />}
-                  >
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  component="span"
+                  onClick={handleUpdate}
+                  startIcon={<CheckIcon />}
+                >
                   Update Post
                 </Button>
               </Paper>
