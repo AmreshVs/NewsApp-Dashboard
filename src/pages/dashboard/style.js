@@ -65,6 +65,9 @@ const style = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  activeLink:{
+    backgroundColor: theme.palette.action.selected
+  }
 }));
 
 export default style;

@@ -12,10 +12,6 @@ const style = makeStyles((theme) => ({
   textBox:{
     width: '100%',
     fontSize: 20,
-    marginBottom: theme.spacing(3)
-  },
-  ckEditor:{
-    height: '500px'
   },
   heading:{
     textAlign: 'start',
@@ -91,6 +87,11 @@ const style = makeStyles((theme) => ({
   },
   loader:{
     textAlign: 'center'
+  },
+  pdfContainer:{
+    backgroundColor: theme.palette.action.selected,
+    padding: 35,
+    borderRadius: 5
   }
 }));
 

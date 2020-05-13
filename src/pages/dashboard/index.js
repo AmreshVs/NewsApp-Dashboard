@@ -20,8 +20,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import HomeIcon from '@material-ui/icons/Home';
 import ViewStreamIcon from '@material-ui/icons/ViewStream';
+import BookIcon from '@material-ui/icons/Book';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Link, useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, useHistory, useRouteMatch, useLocation } from 'react-router-dom';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 
@@ -35,6 +36,7 @@ const Dashboard = (props) => {
   const [open, setOpen] = React.useState(false);
   let history = useHistory();
   let { url } = useRouteMatch();
+  let location = useLocation().pathname;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -52,6 +54,13 @@ const Dashboard = (props) => {
   const handleTheme = () => {
     props.toggleTheme(props.theme === 'light' ? 'dark' : 'light');
   }
+
+  const navLinks = [
+    { id: 1, title: 'Home', url: url, icon: <HomeIcon/>, divider: true },
+    { id: 2, title: 'Add Post', url: `${url}/add-post`, icon: <PostAddIcon/> },
+    { id: 3, title: 'All Post', url: `${url}/all-post`, icon: <ViewStreamIcon/>, divider: true },
+    { id: 4, title: 'Add Pdf', url: `${url}/add-pdf`, icon: <BookIcon/> },
+  ]
 
   return (
     <div className={classes.root}>
@@ -109,27 +118,20 @@ const Dashboard = (props) => {
         </div>
         <Divider />
         <MenuList>
-          <Tooltip title={open === false ? 'Home' : ''} aria-label="home" placement="right">
-            <MenuItem component={Link} to={`${url}`}>
-              <ListItemIcon><HomeIcon /></ListItemIcon>
-              <ListItemText primary={'Home'} />
-            </MenuItem>
-          </Tooltip>
-          <Divider />
-          <Tooltip title={open === false ? 'New Post' : ''} aria-label="New Post" placement="right">
-            <MenuItem component={Link} to={`${url}/new-post`}>
-              <ListItemIcon><PostAddIcon /></ListItemIcon>
-              <ListItemText primary={'New Post'} />
-            </MenuItem>
-          </Tooltip>
-          <Tooltip title={open === false ? 'All Post' : ''} aria-label="All Post" placement="right">
-            <MenuItem component={Link} to={`${url}/all-post`}>
-              <ListItemIcon><ViewStreamIcon /></ListItemIcon>
-              <ListItemText primary={'All Post'} />
-            </MenuItem>
-          </Tooltip>
+          {navLinks.map((item) => {
+            return(
+              <div key={item.id}>
+                <Tooltip title={open === false ? item.title : ''} aria-label={item.title} placement="right" className={location === item.url ? classes.activeLink : ''}>
+                  <MenuItem component={Link} to={item.url}>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.title} />
+                  </MenuItem>
+                </Tooltip>
+                {item.divider === true ? <Divider /> : null}
+              </div>
+            )
+          })}
         </MenuList>
-        <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />

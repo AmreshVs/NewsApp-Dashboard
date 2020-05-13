@@ -7,6 +7,8 @@ import AllPost from '../../pages/posts/allPost';
 import EditPost from '../../pages/posts/editPost';
 import ViewPost from '../../pages/posts/viewPost';
 
+import AddPdf from '../../pages/pdf/addPdf';
+
 const DashNavigation = () => {
   let { path } = useRouteMatch();
   return (
@@ -14,7 +16,7 @@ const DashNavigation = () => {
       <Route exact path={path}>
         <Summary/>
       </Route>
-      <Route path={`${path}/new-post`}>
+      <Route path={`${path}/add-post`}>
         <NewPost/>
       </Route>
       <Route path={`${path}/all-post`}>
@@ -25,6 +27,9 @@ const DashNavigation = () => {
       </Route>
       <Route path={`${path}/view-post/:post_id`}>
         <ViewPost/>
+      </Route>
+      <Route path={`${path}/add-pdf`}>
+        <AddPdf/>
       </Route>
     </Switch>
   )
