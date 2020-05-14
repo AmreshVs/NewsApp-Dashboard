@@ -41,7 +41,7 @@ import TodoList from '@ckeditor/ckeditor5-list/src/todolist';
 import style from './style';
 import ImageUploadAdapter from '../../commonFunctions/imageUploadAdapter';
 import ImageUpload from '../../api/imageUpload';
-import CreatePost from '../../api/newPost';
+import CreatePost from '../../api/post/newPost';
 import GetCategories from '../../api/getCategories';
 import GetBrands from '../../api/getBrands';
 import SnackMessage from '../../commonFunctions/SnackMessage';
@@ -235,7 +235,7 @@ const NewPost = (props) => {
                     onChange={handleFileInput}
                     startIcon={<CloudUploadIcon />}
                   >
-                    Upload
+                    {imageFlag === true ? 'Update Image' : 'Upload Image'}
                   </Button>
                 </label>
               </Paper>

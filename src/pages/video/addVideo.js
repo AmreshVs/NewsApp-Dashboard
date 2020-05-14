@@ -10,18 +10,19 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
+import SyncIcon from '@material-ui/icons/Sync';
 import { useHistory } from "react-router-dom";
 
 import { API_URL } from '../../constants/index';
 import style from './style';
 import ImageUpload from '../../api/imageUpload';
-import PdfUpload from '../../api/pdf/pdfUpload';
-import CreatePdf from '../../api/pdf/addPdf';
+import VideoUpload from '../../api/video/videoUpload';
+import CreateVideo from '../../api/video/addVideo';
 import GetCategories from '../../api/getCategories';
 import GetBrands from '../../api/getBrands';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const NewPdf = (props) => {
+const AddVideo = (props) => {
 
   const history = useHistory();
   const classes = style();
@@ -30,13 +31,15 @@ const NewPdf = (props) => {
   const [tags, setTags] = React.useState('');
   const [image, setImage] = React.useState(require('../../img/img-placeholder.jpg'));
   const [imageFlag, setImageFlag] = React.useState(false);
+  const [videoFlag, setVideoFlag] = React.useState(false);
   const [brandsChecked, setBrandsChecked] = React.useState([]);
   const [brands, setBrands] = React.useState({});
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
   const [categories, setCategories] = React.useState({});
-  const [pdfUrl, setPdfUrl] = React.useState('');
+  const [videoUrl, setVideoUrl] = React.useState('');
+  const [videoLink, setVideoLink] = React.useState(''); //http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
   const fileInput = React.createRef();
-  const pdfFileInput = React.createRef();
+  const videoFileInput = React.createRef();
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -78,9 +81,10 @@ const NewPdf = (props) => {
     setImage(response.url);
   }
 
-  const handlePdfUpload = async (pdf) => {
-    const response = await PdfUpload(pdf, props.userData.token);
-    setPdfUrl(response.url);
+  const handleVideoUpload = async (video) => {
+    const response = await VideoUpload(video, props.userData.token);
+    setVideoUrl(response.url);
+    setVideoFlag(true);
   }
 
   const validateData = () => {
@@ -94,8 +98,8 @@ const NewPdf = (props) => {
       return false;
     }
 
-    if (!pdfUrl) {
-      SnackMessage({ status: 401, msg: 'PDF cannot be empty' });
+    if (!videoUrl) {
+      SnackMessage({ status: 401, msg: 'Video cannot be empty' });
       return false;
     }
 
@@ -119,10 +123,10 @@ const NewPdf = (props) => {
 
   const handleSubmit = async () => {
     if (validateData()) {
-      let data = { title: title, description: description, url: pdfUrl, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
-      const response = await CreatePdf(data, props.userData.token);
+      let data = { title: title, description: description, url: videoUrl, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
+      const response = await CreateVideo(data, props.userData.token);
       SnackMessage({ status: response.status, msg: response.message });
-      history.replace('/dashboard/all-pdf');
+      history.replace('/dashboard/all-video');
     }
   }
 
@@ -134,13 +138,13 @@ const NewPdf = (props) => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <h3 className={classes.heading}>Add PDF</h3>
+                <h3 className={classes.heading}>Add Video</h3>
                 <TextField
                   id="title"
                   variant="outlined"
                   placeholder="Title"
                   className={classes.textBox}
-                  margin="normal"
+                  size="small"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   InputLabelProps={{
@@ -151,8 +155,9 @@ const NewPdf = (props) => {
                   id="description"
                   variant="outlined"
                   placeholder="Description"
-                  className={classes.textBox}
                   margin="normal"
+                  size="small"
+                  className={classes.textBox}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   InputLabelProps={{
@@ -160,14 +165,14 @@ const NewPdf = (props) => {
                   }}
                 />
                 <Grid item xs={12} className={classes.pdfContainer}>
-                  {pdfUrl !== '' ? <object width="100%" height="600" data={pdfUrl !== '' ? API_URL + pdfUrl : ''} type="application/pdf" aria-label="pdf"/> : null}
-                  <label htmlFor="pdf-upload">
+                  {videoUrl !== '' ? <video width="100%" height="600" controls={true} src={videoFlag === true ? API_URL + videoUrl : videoUrl} aria-label="mp4"/> : null}
+                  <label htmlFor="video-upload">
                     <input
-                      accept="pdf/*"
+                      accept="video/*"
                       className={classes.input}
-                      id="pdf-upload"
-                      ref={pdfFileInput}
-                      onChange={(e) => handlePdfUpload(e.target.files[0])}
+                      id="video-upload"
+                      ref={videoFileInput}
+                      onChange={(e) => handleVideoUpload(e.target.files[0])}
                       type="file"
                     />
                     <Button
@@ -178,9 +183,38 @@ const NewPdf = (props) => {
                       onChange={handleFileInput}
                       startIcon={<CloudUploadIcon />}
                     >
-                      Upload PDF
+                      Upload Video
                     </Button>
                   </label>
+                  <p>or</p>
+                  <Grid container>
+                    <Grid item xs={10}>
+                      <TextField
+                        id="video-link"
+                        variant="outlined"
+                        size="small"
+                        placeholder="Video Link"
+                        className={classes.textBox}
+                        value={videoLink}
+                        onChange={(e) => setVideoLink(e.target.value)}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.pdfButton}
+                        component="span"
+                        startIcon={<SyncIcon />}
+                        onClick={() => setVideoUrl(videoLink)}
+                      >
+                        Parse Video
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Paper>
             </Grid>
@@ -287,4 +321,4 @@ const mapStateToProps = (state) => {
   return state.common;
 }
 
-export default connect(mapStateToProps)(NewPdf);
+export default connect(mapStateToProps)(AddVideo);

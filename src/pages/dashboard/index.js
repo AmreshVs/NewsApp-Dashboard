@@ -21,6 +21,9 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import HomeIcon from '@material-ui/icons/Home';
 import ViewStreamIcon from '@material-ui/icons/ViewStream';
 import BookIcon from '@material-ui/icons/Book';
+import VideoLabelIcon from '@material-ui/icons/VideoLabel';
+import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
+import AmpStoriesIcon from '@material-ui/icons/AmpStories';
 import Tooltip from '@material-ui/core/Tooltip';
 import { Link, useHistory, useRouteMatch, useLocation } from 'react-router-dom';
 import MenuList from '@material-ui/core/MenuList';
@@ -60,6 +63,9 @@ const Dashboard = (props) => {
     { id: 2, title: 'Add Post', url: `${url}/add-post`, icon: <PostAddIcon/> },
     { id: 3, title: 'All Post', url: `${url}/all-post`, icon: <ViewStreamIcon/>, divider: true },
     { id: 4, title: 'Add Pdf', url: `${url}/add-pdf`, icon: <BookIcon/> },
+    { id: 5, title: 'All Pdf', url: `${url}/all-pdf`, icon: <AmpStoriesIcon/>, divider: true },
+    { id: 6, title: 'Add Video', url: `${url}/add-video`, icon: <VideoLabelIcon/> },
+    { id: 7, title: 'All Video', url: `${url}/all-video`, icon: <VideoLibraryIcon/>, divider: true },
   ]
 
   return (
@@ -83,8 +89,9 @@ const Dashboard = (props) => {
           >
             <MenuIcon />
           </IconButton>
+          <img width={40} src={require('../../img/logo.png')} alt="upload" />
           <Typography variant="h6" className={classes.title}>
-            Valar Tamil
+             Valar Tamil
           </Typography>
           <Tooltip title="Toggle Theme" aria-label="toggle-theme">
             <IconButton color="inherit" aria-label="menu" onClick={handleTheme}>

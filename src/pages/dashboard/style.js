@@ -64,6 +64,7 @@ const style = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    paddingLeft: 5
   },
   activeLink:{
     backgroundColor: theme.palette.action.selected

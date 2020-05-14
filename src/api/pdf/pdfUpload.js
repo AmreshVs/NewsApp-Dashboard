@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL } from '../constants/index';
+import { API_URL } from '../../constants/index';
 
 const PdfUpload = async (pdf, token) => {
 

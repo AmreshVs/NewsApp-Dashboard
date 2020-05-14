@@ -1,14 +1,13 @@
 import axios from 'axios';
-import { API_URL } from '../constants/index';
+import { API_URL } from '../../constants/index';
 
-const AddPdf = async (data, token) => {  
+const GetPdf = async (id, token) => {  
   return await axios({
-    method: 'POST',
-    url: API_URL + '/add-pdf',
+    method: 'GET',
+    url: API_URL + '/get-pdf?id=' + id,
     headers: {
-      'Authorization': token
+      'Authorization': token,
     },
-    data: data
   })
   .then(function (response) {
     return response.data;
@@ -18,4 +17,4 @@ const AddPdf = async (data, token) => {
   });
 }
 
-export default AddPdf;
+export default GetPdf;

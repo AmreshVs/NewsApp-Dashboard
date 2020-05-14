@@ -13,15 +13,15 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 
 import style from './style';
-import GetPost from '../../api/post/getPost';
+import GetVideo from '../../api/video/getVideo';
 import AddComment from '../../api/addComment';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const ViewPost = (props) => {
+const ViewVideo = (props) => {
 
   const classes = style();
-  const { post_id } = useParams();
+  const { video_id } = useParams();
   const [loading, setLoading] = React.useState(true);
   const [comment, setComment] = React.useState('');
   const [innerComment, setInnerComment] = React.useState('');
@@ -30,14 +30,14 @@ const ViewPost = (props) => {
 
   React.useEffect(() => {
     const loadData = async () => {
-      let response = await GetPost(post_id, props.token);
+      let response = await GetVideo(video_id, props.token);
       setData(response.data);
       setLoading(false);
     }
     if(loading === true){
       loadData();
     }
-  }, [props.token, post_id, loading]);
+  }, [props.token, video_id, loading]);
 
   const handleReply = (index) => {
     setReply(index);
@@ -148,4 +148,4 @@ const mapStateToProps = (state) => {
   return state.common.userData;
 }
 
-export default connect(mapStateToProps)(ViewPost);
+export default connect(mapStateToProps)(ViewVideo);

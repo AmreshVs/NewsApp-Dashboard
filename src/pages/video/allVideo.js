@@ -21,12 +21,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
 import style from './style';
-import GetAllPost from '../../api/getAllPost';
-import deletePost from '../../api/deletePost';
+import GetAllVideo from '../../api/video/getAllVideo';
+import deleteVideo from '../../api/video/deleteVideo';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const AllPost = (props) => {
+const AllVideo = (props) => {
 
   let history = useHistory();
   let location = useLocation();
@@ -45,7 +45,7 @@ const AllPost = (props) => {
   React.useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      let response = await GetAllPost(page, pageSize, props.token);
+      let response = await GetAllVideo(page, pageSize, props.token);
       setData(response.data);
       setTotalPages(response.pagination.totalPages);
       setLoading(false);
@@ -60,7 +60,7 @@ const AllPost = (props) => {
   }
 
   const handleDelete = async () => {
-    let response = await deletePost(id, props.token);
+    let response = await deleteVideo(id, props.token);
     setOpen(false);
     SnackMessage({ status: response.status, msg: response.message });
     if(response.status === 200){
@@ -71,11 +71,10 @@ const AllPost = (props) => {
   const handlePageSize = (e) => {
     setPageSize(e.target.value);
   }
-  console.log(data.length)
 
   const reloadData = async () => {
     setLoading(true);
-    let response = await GetAllPost(1, 10, props.token);
+    let response = await GetAllVideo(page, pageSize, props.token);
     setData(response.data);
     setTotalPages(response.pagination.totalPages);
     setLoading(false);
@@ -127,7 +126,7 @@ const AllPost = (props) => {
                           <img className={classes.postsimage} src={API_URL + item.featured_img} alt="upload" />
                         </Grid>
                         <Grid item xs={3} className={classes.tableCell}>
-                          <Typography variant="body1" gutterBottom>
+                          <Typography variant="body1" className={classes.pointer} gutterBottom onClick={() => history.push('/dashboard/view-video/' + item.id)}>
                             {item.title}
                           </Typography>
                         </Grid>
@@ -160,7 +159,7 @@ const AllPost = (props) => {
                             <Button variant="contained" size="small" color="secondary" onClick={() => handleEdit(item.id)}>
                               Delete
                             </Button>
-                            <Button variant="contained" size="small" color="primary" onClick={() => history.push('/dashboard/edit-post/' + item.id)}>
+                            <Button variant="contained" size="small" color="primary" onClick={() => history.push('/dashboard/edit-video/' + item.id)}>
                               Edit
                             </Button>
                           </div>
@@ -178,7 +177,7 @@ const AllPost = (props) => {
                 renderItem={(item) => (
                   <PaginationItem
                     component={Link}
-                    to={`/dashboard/all-post${item.page === 1 ? '' : `?page=${item.page}&size=${pageSize}`}`}
+                    to={`/dashboard/all-video${item.page === 1 ? '' : `?page=${item.page}&size=${pageSize}`}`}
                     {...item}
                   />
                 )}
@@ -212,7 +211,7 @@ const AllPost = (props) => {
         <DialogTitle id="alert-dialog-title">{"Are you sure to delete?"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Deleting post is irreversable. Click 'Ok' to proceed
+            Deleting video is irreversable. Click 'Ok' to proceed
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -232,4 +231,4 @@ const mapStateToProps = (state) => {
   return state.common.userData;
 };
 
-export default connect(mapStateToProps)(AllPost);
+export default connect(mapStateToProps)(AllVideo);

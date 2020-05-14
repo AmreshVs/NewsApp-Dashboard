@@ -1,14 +1,13 @@
 import axios from 'axios';
-import { API_URL } from '../constants/index';
+import { API_URL } from '../../constants/index';
 
-const NewPost = async (data, token) => {  
+const GetVideo = async (id, token) => {  
   return await axios({
-    method: 'POST',
-    url: API_URL + '/new-post',
+    method: 'GET',
+    url: API_URL + '/get-video?id=' + id,
     headers: {
-      'Authorization': token
+      'Authorization': token,
     },
-    data: data
   })
   .then(function (response) {
     return response.data;
@@ -18,4 +17,4 @@ const NewPost = async (data, token) => {
   });
 }
 
-export default NewPost;
+export default GetVideo;

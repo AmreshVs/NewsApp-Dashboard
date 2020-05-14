@@ -91,6 +91,12 @@ const style = makeStyles((theme) => ({
   },
   loader:{
     textAlign: 'center'
+  },
+  pointer:{
+    cursor: 'pointer',
+    '&:hover':{
+      color: theme.palette.primary.main
+    },
   }
 }));
 

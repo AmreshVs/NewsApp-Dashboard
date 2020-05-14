@@ -13,15 +13,15 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 
 import style from './style';
-import GetPost from '../../api/getPost';
+import GetPdf from '../../api/pdf/getPdf';
 import AddComment from '../../api/addComment';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const ViewPost = (props) => {
+const ViewPdf = (props) => {
 
   const classes = style();
-  const { post_id } = useParams();
+  const { pdf_id } = useParams();
   const [loading, setLoading] = React.useState(true);
   const [comment, setComment] = React.useState('');
   const [innerComment, setInnerComment] = React.useState('');
@@ -30,21 +30,21 @@ const ViewPost = (props) => {
 
   React.useEffect(() => {
     const loadData = async () => {
-      let response = await GetPost(post_id, props.token);
+      let response = await GetPdf(pdf_id, props.token);
       setData(response.data);
       setLoading(false);
     }
     if(loading === true){
       loadData();
     }
-  }, [props.token, post_id, loading]);
+  }, [props.token, pdf_id, loading]);
 
   const handleReply = (index) => {
     setReply(index);
   }
 
   const handlePostReply = async () => {
-    let response = await AddComment({user_id: props.user_id, comment: comment, comment_type: 'post', reply_to: 'post', reply_id: data.id, is_verified: props.user_type === 'admin' ? 1 : 0}, props.token);
+    let response = await AddComment({user_id: props.user_id, comment: comment, comment_type: 'pdf', reply_to: 'post', reply_id: data.id, is_verified: props.user_type === 'admin' ? 1 : 0}, props.token);
     SnackMessage({ status: response.status, msg: response.message });
     setComment('');
     if(response.message === 'Comment Added'){
@@ -53,7 +53,7 @@ const ViewPost = (props) => {
   }
 
   const handlePostInnerReply = async (index) => {
-    let response = await AddComment({user_id: props.user_id, comment: innerComment, comment_type: 'post', reply_to: 'comment', reply_id: index, is_verified: props.user_type === 'admin' ? 1 : 0}, props.token);
+    let response = await AddComment({user_id: props.user_id, comment: innerComment, comment_type: 'pdf', reply_to: 'comment', reply_id: index, is_verified: props.user_type === 'admin' ? 1 : 0}, props.token);
     SnackMessage({ status: response.status, msg: response.message });
     setInnerComment('');
     setReply('');
@@ -75,7 +75,7 @@ const ViewPost = (props) => {
           <div>
             <img className={classes.image} alt="featured" src={API_URL + data.featured_img} />
             <Typography variant="h5">{data.title}</Typography>
-            <div>{ ReactHtmlParser(data.content) }</div>
+            <object width="100%" height={600} data={API_URL + data.url} aria-label="pdf" />
             <Typography variant="h6" className={classes.commentHeading}>Comments</Typography>
             <Divider />
             {data.comments.map((item, index) => {
@@ -148,4 +148,4 @@ const mapStateToProps = (state) => {
   return state.common.userData;
 }
 
-export default connect(mapStateToProps)(ViewPost);
+export default connect(mapStateToProps)(ViewPdf);

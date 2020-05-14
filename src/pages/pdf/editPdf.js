@@ -12,55 +12,33 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import { useParams, useHistory } from 'react-router-dom';
 
-import CKEditor from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import Font from '@ckeditor/ckeditor5-font/src/font';
-import EssentialsPlugin from '@ckeditor/ckeditor5-essentials/src/essentials';
-import UploadAdapterPlugin from '@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter';
-import AutoformatPlugin from '@ckeditor/ckeditor5-autoformat/src/autoformat';
-import BoldPlugin from '@ckeditor/ckeditor5-basic-styles/src/bold';
-import ItalicPlugin from '@ckeditor/ckeditor5-basic-styles/src/italic';
-import BlockQuotePlugin from '@ckeditor/ckeditor5-block-quote/src/blockquote';
-import HeadingPlugin from '@ckeditor/ckeditor5-heading/src/heading';
-import ImagePlugin from '@ckeditor/ckeditor5-image/src/image';
-import ImageCaptionPlugin from '@ckeditor/ckeditor5-image/src/imagecaption';
-import ImageStylePlugin from '@ckeditor/ckeditor5-image/src/imagestyle';
-import ImageToolbarPlugin from '@ckeditor/ckeditor5-image/src/imagetoolbar';
-import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
-import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
-import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
-import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
-import PageBreak from '@ckeditor/ckeditor5-page-break/src/pagebreak';
-import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice';
-import SpecialCharacters from '@ckeditor/ckeditor5-special-characters/src/specialcharacters';
-import SpecialCharactersEssentials from '@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials';
-import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
-import TodoList from '@ckeditor/ckeditor5-list/src/todolist';
-
 import style from './style';
-import ImageUploadAdapter from '../../commonFunctions/imageUploadAdapter';
+import PdfUpload from '../../api/pdf/pdfUpload';
 import ImageUpload from '../../api/imageUpload';
-import CreatePost from '../../api/newPost';
-import GetPost from '../../api/getPost';
+import CreatePdf from '../../api/pdf/addPdf';
+import GetPdf from '../../api/pdf/getPdf';
 import GetCategories from '../../api/getCategories';
 import GetBrands from '../../api/getBrands';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 import { API_URL } from '../../constants/index';
 
-const EditPost = (props) => {
+const EditPdf = (props) => {
 
   const history = useHistory();
-  const { post_id } = useParams();
+  const { pdf_id } = useParams();
   const classes = style();
   const [title, setTitle] = React.useState('');
-  const [content, setContent] = React.useState('');
+  const [description, setDescription] = React.useState('');
   const [tags, setTags] = React.useState('');
   const [image, setImage] = React.useState(require('../../img/img-placeholder.jpg'));
+  const [imageFlag, setImageFlag] = React.useState(false);
   const [brandsChecked, setBrandsChecked] = React.useState([]);
   const [brands, setBrands] = React.useState({});
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
   const [categories, setCategories] = React.useState({});
+  const [pdfUrl, setPdfUrl] = React.useState('');
   const fileInput = React.createRef();
+  const pdfFileInput = React.createRef();
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -68,14 +46,14 @@ const EditPost = (props) => {
       const brands_response = await GetBrands(props.userData.token);
       setCategories(categories_response);
       setBrands(brands_response);
-      const post_response = await GetPost(post_id, props.userData.token);
+      const post_response = await GetPdf(pdf_id, props.userData.token);
       updateData(post_response.data);
     }
     loadData();
-  }, [props.userData.token, post_id])
+  }, [props.userData.token, pdf_id])
 
   const updateData = (data) => {
-    let { title, content, tags, featured_img, categories, brands } = data;
+    let { title, description, tags, url, featured_img, categories, brands } = data;
     let categories_data = categories.split(',');
     let categories_array = [];
     categories_data.map((item) => {
@@ -87,8 +65,9 @@ const EditPost = (props) => {
       return brands_array.push(parseInt(item));
     });
     setTitle(title);
-    setContent(content);
+    setDescription(description);
     setTags(tags);
+    setPdfUrl(url);
     setImage(featured_img);
     setCategoriesChecked(categories_array);
     setBrandsChecked(brands_array);
@@ -118,19 +97,24 @@ const EditPost = (props) => {
     }
   }
 
-  const handleFileInput = async (image) => {
-    const response = await ImageUpload(image, props.userData.token);
-    setImage(response.url);
-  }
-
   const validateData = () => {
     if (!title) {
       SnackMessage({ status: 401, msg: 'Title cannot be empty' });
       return false;
     }
 
-    if (!content) {
-      SnackMessage({ status: 401, msg: 'Content cannot be empty' });
+    if (!description) {
+      SnackMessage({ status: 401, msg: 'description cannot be empty' });
+      return false;
+    }
+
+    if (!pdfUrl) {
+      SnackMessage({ status: 401, msg: 'PDF cannot be empty' });
+      return false;
+    }
+    
+    if (!imageFlag) {
+      SnackMessage({ status: 401, msg: 'Image cannot be empty' });
       return false;
     }
 
@@ -147,31 +131,25 @@ const EditPost = (props) => {
     return true;
   }
 
-  const handleUpdate = async () => {
-    if (validateData()) {
-      let data = { id: post_id, title: title, content: content, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
-      const response = await CreatePost(data, props.userData.token);
-      SnackMessage({ status: response.status, msg: response.message });
-      history.push('/dashboard/all-post');
-    }
+  const handleFileInput = async (image) => {
+    setImageFlag(true);
+    const response = await ImageUpload(image, props.userData.token);
+    setImage(response.url);
   }
 
-  const editorConfiguration = {
-    plugins: [
-      EssentialsPlugin, AutoformatPlugin, BoldPlugin, ItalicPlugin, BlockQuotePlugin, HeadingPlugin, ImagePlugin, ImageCaptionPlugin, ImageStylePlugin, ImageToolbarPlugin, ImageUploadPlugin, LinkPlugin, ListPlugin, ParagraphPlugin, UploadAdapterPlugin, Font, PageBreak, PasteFromOffice, SpecialCharacters, SpecialCharactersEssentials, Alignment, TodoList
-    ],
-    toolbar: [
-      'heading', 'bold', 'italic', 'alignment', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'pageBreak', 'link', 'bulletedList', 'numberedList', 'imageUpload', 'blockQuote', 'SpecialCharacters', 'todoList', 'undo', 'redo',
-    ],
-    image: {
-      toolbar: [
-        'imageStyle:full',
-        'imageStyle:side',
-        '|',
-        'imageTextAlternative'
-      ]
+  const handlePdfUpload = async (pdf) => {
+    const response = await PdfUpload(pdf, props.userData.token);
+    setPdfUrl(response.url);
+  }
+
+  const handleUpdate = async () => {
+    if (validateData()) {
+      let data = { id: pdf_id, title: title, description: description, url: pdfUrl, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
+      const response = await CreatePdf(data, props.userData.token);
+      SnackMessage({ status: response.status, msg: response.message });
+      history.push('/dashboard/all-pdf');
     }
-  };
+  }
 
   return (
     <React.Fragment>
@@ -181,7 +159,7 @@ const EditPost = (props) => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <h3 className={classes.heading}>Edit Post</h3>
+                <h3 className={classes.heading}>Edit Pdf</h3>
                 <TextField
                   id="standard-full-width"
                   variant="outlined"
@@ -194,20 +172,41 @@ const EditPost = (props) => {
                     shrink: true,
                   }}
                 />
-                <CKEditor
-                  activeClass={classes.ckEditor}
-                  editor={ClassicEditor}
-                  config={editorConfiguration}
-                  data={content}
-                  onInit={editor => {
-                    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-                      return new ImageUploadAdapter(loader);
-                    };
-                  }}
-                  onChange={(event, editor) => {
-                    setContent(editor.getData());
+                <TextField
+                  id="description"
+                  variant="outlined"
+                  placeholder="Description"
+                  className={classes.textBox}
+                  margin="normal"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  InputLabelProps={{
+                    shrink: true,
                   }}
                 />
+                <Grid item xs={12} className={classes.pdfContainer}>
+                  {pdfUrl !== '' ? <object width="100%" height="600" data={pdfUrl !== '' ? API_URL + pdfUrl : ''} type="application/pdf" aria-label="pdf"/> : null}
+                  <label htmlFor="pdf-upload">
+                    <input
+                      accept="pdf/*"
+                      className={classes.input}
+                      id="pdf-upload"
+                      ref={pdfFileInput}
+                      onChange={(e) => handlePdfUpload(e.target.files[0])}
+                      type="file"
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.pdfButton}
+                      component="span"
+                      onChange={handleFileInput}
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Update PDF
+                    </Button>
+                  </label>
+                </Grid>
               </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -252,7 +251,7 @@ const EditPost = (props) => {
                     onChange={handleFileInput}
                     startIcon={<CloudUploadIcon />}
                   >
-                    Upload
+                    Update Image
                   </Button>
                 </label>
               </Paper>
@@ -314,4 +313,4 @@ const mapStateToProps = (state) => {
   return state.common;
 }
 
-export default connect(mapStateToProps)(EditPost);
+export default connect(mapStateToProps)(EditPdf);

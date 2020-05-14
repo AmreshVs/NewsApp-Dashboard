@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { API_URL } from '../constants/index';
+import { API_URL } from '../../constants/index';
 
-const DeletePost = async (id, token) => {  
+const GetAllPost = async (page, size, token) => {  
   return await axios({
     method: 'GET',
-    url: API_URL + '/delete-post?id=' + id,
+    url: `${API_URL}/get-all-post?page=${page}&size=${size}`,
     headers: {
       'Authorization': token,
     },
@@ -17,4 +17,4 @@ const DeletePost = async (id, token) => {
   });
 }
 
-export default DeletePost;
+export default GetAllPost;
