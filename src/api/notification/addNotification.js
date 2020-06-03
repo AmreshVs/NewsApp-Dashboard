@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { API_URL } from '../../constants/index';
 
-const NewPost = async (data, token) => {  
+const AddNotification = async (data, token) => {  
   return await axios({
     method: 'POST',
-    url: API_URL + '/new-post',
+    url: API_URL + '/add-notification',
     headers: {
-      'Authorization': token
+      'Authorization': token,
+      'Content-Type': 'application/json'
     },
     data: data
   })
@@ -18,4 +19,4 @@ const NewPost = async (data, token) => {
   });
 }
 
-export default NewPost;
+export default AddNotification;

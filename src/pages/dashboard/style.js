@@ -68,6 +68,31 @@ const style = makeStyles((theme) => ({
   },
   activeLink:{
     backgroundColor: theme.palette.action.selected
+  },
+  image:{
+    width: '100%',
+    height: 70,
+    borderRadius: 5
+  },
+  imagePdf:{
+    width: '100%',
+    height: 150,
+    borderRadius: 5
+  },
+  paper:{
+    padding: 10
+  },
+  divider:{
+    marginBottom: 5
+  },
+  pointer:{
+    cursor: 'pointer',
+    '&:hover':{
+      color: theme.palette.primary.main
+    },
+  },
+  loader:{
+    textAlign: 'center'
   }
 }));
 

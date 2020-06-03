@@ -10,7 +10,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
-import { useParams, useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import { API_URL } from '../../constants/index';
 
 import CKEditor from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
@@ -40,22 +41,20 @@ import TodoList from '@ckeditor/ckeditor5-list/src/todolist';
 import style from './style';
 import ImageUploadAdapter from '../../commonFunctions/imageUploadAdapter';
 import ImageUpload from '../../api/imageUpload';
-import CreatePost from '../../api/post/newPost';
-import GetPost from '../../api/post/getPost';
+import CreateNews from '../../api/news/newNews';
 import GetCategories from '../../api/getCategories';
 import GetBrands from '../../api/getBrands';
 import SnackMessage from '../../commonFunctions/SnackMessage';
-import { API_URL } from '../../constants/index';
 
-const EditPost = (props) => {
+const NewNews = (props) => {
 
   const history = useHistory();
-  const { post_id } = useParams();
   const classes = style();
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [tags, setTags] = React.useState('');
   const [image, setImage] = React.useState(require('../../img/img-placeholder.jpg'));
+  const [imageFlag, setImageFlag] = React.useState(false);
   const [brandsChecked, setBrandsChecked] = React.useState([]);
   const [brands, setBrands] = React.useState({});
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
@@ -68,31 +67,9 @@ const EditPost = (props) => {
       const brands_response = await GetBrands(props.userData.token);
       setCategories(categories_response);
       setBrands(brands_response);
-      const post_response = await GetPost(post_id, props.userData.token);
-      updateData(post_response.data);
     }
     loadData();
-  }, [props.userData.token, post_id])
-
-  const updateData = (data) => {
-    let { title, content, tags, featured_img, categories, brands } = data;
-    let categories_data = categories.split(',');
-    let categories_array = [];
-    categories_data.map((item) => {
-      return categories_array.push(parseInt(item));
-    });
-    let brands_data = brands.split(',');
-    let brands_array = [];
-    brands_data.map((item) => {
-      return brands_array.push(parseInt(item));
-    });
-    setTitle(title);
-    setContent(content);
-    setTags(tags);
-    setImage(featured_img);
-    setCategoriesChecked(categories_array);
-    setBrandsChecked(brands_array);
-  }
+  }, [props.userData.token])
 
   const handleBrandsCheck = (id) => {
     if (!brandsChecked.includes(id)) {
@@ -119,6 +96,7 @@ const EditPost = (props) => {
   }
 
   const handleFileInput = async (image) => {
+    setImageFlag(true);
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
   }
@@ -131,6 +109,11 @@ const EditPost = (props) => {
 
     if (!content) {
       SnackMessage({ status: 401, msg: 'Content cannot be empty' });
+      return false;
+    }
+
+    if (!imageFlag) {
+      SnackMessage({ status: 401, msg: 'Image cannot be empty' });
       return false;
     }
 
@@ -147,12 +130,12 @@ const EditPost = (props) => {
     return true;
   }
 
-  const handleUpdate = async () => {
+  const handleSubmit = async () => {
     if (validateData()) {
-      let data = { id: post_id, title: title, content: content, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
-      const response = await CreatePost(data, props.userData.token);
+      let data = { title: title, content: content, featured_img: image, categories: categoriesChecked, brands: brandsChecked, tags: tags };
+      const response = await CreateNews(data, props.userData.token);
       SnackMessage({ status: response.status, msg: response.message });
-      history.push('/dashboard/all-post');
+      history.replace('/dashboard/all-post');
     }
   }
 
@@ -181,7 +164,7 @@ const EditPost = (props) => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <h3 className={classes.heading}>Edit Post</h3>
+                <h3 className={classes.heading}>New Post</h3>
                 <TextField
                   id="standard-full-width"
                   variant="outlined"
@@ -198,10 +181,10 @@ const EditPost = (props) => {
                   activeClass={classes.ckEditor}
                   editor={ClassicEditor}
                   config={editorConfiguration}
-                  data={content}
+                  data=""
                   onInit={editor => {
                     editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-                      return new ImageUploadAdapter(loader);
+                      return new ImageUploadAdapter(loader, props.userData.token);
                     };
                   }}
                   onChange={(event, editor) => {
@@ -234,7 +217,7 @@ const EditPost = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={title !== '' ? API_URL + image : image} alt="upload" />
+                  <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -252,7 +235,7 @@ const EditPost = (props) => {
                     onChange={handleFileInput}
                     startIcon={<CloudUploadIcon />}
                   >
-                    Update Image
+                    {imageFlag === true ? 'Update Image' : 'Upload Image'}
                   </Button>
                 </label>
               </Paper>
@@ -279,10 +262,10 @@ const EditPost = (props) => {
                 <TextField
                   id="outlined-multiline-static"
                   className={classes.textBox}
-                  variant="outlined"
                   multiline
                   rows={5}
                   placeholder="politics, news, breaking news, ..."
+                  variant="outlined"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                 />
@@ -296,10 +279,10 @@ const EditPost = (props) => {
                   color="primary"
                   className={classes.button}
                   component="span"
-                  onClick={handleUpdate}
+                  onClick={handleSubmit}
                   startIcon={<CheckIcon />}
                 >
-                  Update Post
+                  Submit Post
                 </Button>
               </Paper>
             </Grid>
@@ -314,4 +297,4 @@ const mapStateToProps = (state) => {
   return state.common;
 }
 
-export default connect(mapStateToProps)(EditPost);
+export default connect(mapStateToProps)(NewNews);

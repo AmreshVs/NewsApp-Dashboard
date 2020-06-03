@@ -19,10 +19,14 @@ import Pagination from '@material-ui/lab/Pagination';
 import PaginationItem from '@material-ui/lab/PaginationItem';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 
 import style from './style';
 import GetAllVideo from '../../api/video/getAllVideo';
 import deleteVideo from '../../api/video/deleteVideo';
+import addNotification from '../../api/notification/addNotification';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
@@ -40,7 +44,25 @@ const AllVideo = (props) => {
   const [pageSizeOpen, setPageSizeOpen] = React.useState(false);
   const query = new URLSearchParams(location.search);
   const page = parseInt(query.get('page') || '1', 10);
-  
+  const [videoSize, setVideoSize] = React.useState('detail');
+  const [checked, setChecked] = React.useState(false);
+  const [notificationOpen, setNotificationOpen] = React.useState(false);
+  const [checkedData, setCheckedData] = React.useState(
+    {
+      "priority": "high",
+      "notification" : {
+        "title": "",
+        "body": "மேலும் படிக்க கிளிக் செய்யவும்",
+        "image": ""
+      },
+      "data":{
+        "type": "videos",
+        "display": "detail",
+        "id": "",
+        "url": ""
+      }
+    }
+  );
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -79,15 +101,54 @@ const AllVideo = (props) => {
     setTotalPages(response.pagination.totalPages);
     setLoading(false);
   }
+
+  const handleChange = (index, item) => {
+    setChecked(index);
+    let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
+    setCheckedData({
+      ...checkedData, 
+      notification:{
+        ...checkedData.notification,
+        title: item.title,
+        image: image,
+      },
+      data:{
+        ...checkedData.data,
+        id: item.id,
+        url: item.url
+      }
+    })
+  };
+
+  const handleSendNotification = async () => {
+    let notificationData = checkedData;
+    notificationData = {
+      ...notificationData,
+      data:{
+        ...notificationData.data,
+        display: videoSize
+      }
+    }
+    const response = await addNotification(notificationData, props.token);
+    setNotificationOpen(false);
+    if(response.status === 200){
+      SnackMessage({ status: response.status, msg: response.message });
+    }
+  }
   
   return (
     <React.Fragment>
       <CssBaseline />
+      <div className={classes.notificationContainer}>
+        <Button variant="contained" size="small" color="primary" onClick={() => setNotificationOpen(true)} disabled={checked === false ? true : false} >
+          Send Notification
+        </Button>
+      </div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
           <Grid container spacing={1}>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Image</Typography>
               </Grid>
               <Grid item xs={3}>
@@ -96,7 +157,7 @@ const AllVideo = (props) => {
               <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Categories</Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <Typography variant="body1" className={classes.tableHeading}>Brands</Typography>
               </Grid>
               <Grid item xs={1}>
@@ -117,13 +178,15 @@ const AllVideo = (props) => {
                 </div>
               :
                 
-                data !== {} && data.map((item) => {
+                data !== {} && data.map((item, index) => {
+                  let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
                   return (
                     <div key={item.id}>
                       <Divider className={classes.divider} />
                       <Grid container spacing={1}>
-                        <Grid item xs={1} className={classes.tableCell}>
-                          <img className={classes.postsimage} src={API_URL + item.featured_img} alt="upload" />
+                        <Grid item xs={2} className={classes.tableCell}>
+                          <Checkbox color="primary" checked={checked === index} onChange={() => handleChange(index, item)} />
+                          <img className={classes.postsimage} src={image} alt="upload" />
                         </Grid>
                         <Grid item xs={3} className={classes.tableCell}>
                           <Typography variant="body1" className={classes.pointer} gutterBottom onClick={() => history.push('/dashboard/view-video/' + item.id)}>
@@ -137,7 +200,7 @@ const AllVideo = (props) => {
                             })}
                           </div>
                         </Grid>
-                        <Grid item xs={2} className={classes.tableCell}>
+                        <Grid item xs={1} className={classes.tableCell}>
                           <div className={classes.chips}>
                             {(item.brands).map((chip) => {
                               return <Chip key={chip} label={chip} size="small" color="primary" variant="outlined" />
@@ -219,6 +282,40 @@ const AllVideo = (props) => {
             Cancel
           </Button>
           <Button onClick={handleDelete} color="primary" autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Are you sure to send notification?"}</DialogTitle>
+        <DialogContent className={classes.dialogContent}>
+          <FormControl variant="outlined" className={classes.formControlSelect}>
+            <InputLabel id="video-size">Video Size</InputLabel>
+            <Select
+              labelId="video-size"
+              id="video-size-select"
+              value={videoSize}
+              onChange={(event) => setVideoSize(event.target.value)}
+              label="Video Size"
+            >
+              <MenuItem value='detail'>Detail</MenuItem>
+              <MenuItem value='full'>Full</MenuItem>
+            </Select>
+          </FormControl>
+          <DialogContentText id="alert-dialog-description">
+            Sending notification is irreversable.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setNotificationOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSendNotification} color="primary" autoFocus>
             Ok
           </Button>
         </DialogActions>

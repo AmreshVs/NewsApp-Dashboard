@@ -19,25 +19,44 @@ import Pagination from '@material-ui/lab/Pagination';
 import PaginationItem from '@material-ui/lab/PaginationItem';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import style from './style';
-import GetAllPost from '../../api/post/getAllPost';
-import deletePost from '../../api/post/deletePost';
+import GetAllNews from '../../api/news/getAllNews';
+import deleteNews from '../../api/news/deleteNews';
+import addNotification from '../../api/notification/addNotification';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const AllPost = (props) => {
+const AllNews = (props) => {
 
   let history = useHistory();
   let location = useLocation();
   const classes = style();
   const [open, setOpen] = React.useState(false);
+  const [notificationOpen, setNotificationOpen] = React.useState(false);
   const [id, setId] = React.useState('');
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState({});
   const [totalPages, setTotalPages] = React.useState(10);
   const [pageSize, setPageSize] = React.useState(10);
   const [pageSizeOpen, setPageSizeOpen] = React.useState(false);
+  const [checked, setChecked] = React.useState(false);
+  const [checkedData, setCheckedData] = React.useState(
+    {
+      "priority": "high",
+      "notification" : {
+        "title": "",
+        "body": "மேலும் படிக்க கிளிக் செய்யவும்",
+        "image": ""
+      },
+      "data":{
+        "type": "news",
+        "display": "detail",
+        "id": "",
+      }
+    }
+  );
   const query = new URLSearchParams(location.search);
   const page = parseInt(query.get('page') || '1', 10);
   
@@ -45,7 +64,7 @@ const AllPost = (props) => {
   React.useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      let response = await GetAllPost(page, pageSize, props.token);
+      let response = await GetAllNews(page, pageSize, props.token);
       setData(response.data);
       setTotalPages(response.pagination.totalPages);
       setLoading(false);
@@ -54,13 +73,30 @@ const AllPost = (props) => {
     loadData();
   }, [props.token, page, pageSize]);
 
+  const handleChange = (index, item) => {
+    setChecked(index);
+    let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
+    setCheckedData({
+      ...checkedData, 
+      notification:{
+        ...checkedData.notification,
+        title: item.title,
+        image: image,
+      },
+      data:{
+        ...checkedData.data,
+        id: item.id
+      }
+    })
+  };
+
   const handleEdit = (id) => {
     setId(id);
     setOpen(true);
   }
 
   const handleDelete = async () => {
-    let response = await deletePost(id, props.token);
+    let response = await deleteNews(id, props.token);
     setOpen(false);
     SnackMessage({ status: response.status, msg: response.message });
     if(response.status === 200){
@@ -74,20 +110,33 @@ const AllPost = (props) => {
 
   const reloadData = async () => {
     setLoading(true);
-    let response = await GetAllPost(1, 10, props.token);
+    let response = await GetAllNews(1, 10, props.token);
     setData(response.data);
     setTotalPages(response.pagination.totalPages);
     setLoading(false);
+  }
+
+  const handleSendNotification = async () => {
+    const response = await addNotification(checkedData, props.token);
+    setNotificationOpen(false);
+    if(response.status === 200){
+      SnackMessage({ status: response.status, msg: response.message });
+    }
   }
   
   return (
     <React.Fragment>
       <CssBaseline />
+      <div className={classes.notificationContainer}>
+        <Button variant="contained" size="small" color="primary" onClick={() => setNotificationOpen(true)} disabled={checked === false ? true : false}>
+          Send Notification
+        </Button>
+      </div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
           <Grid container spacing={1}>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Image</Typography>
               </Grid>
               <Grid item xs={3}>
@@ -96,7 +145,7 @@ const AllPost = (props) => {
               <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Categories</Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <Typography variant="body1" className={classes.tableHeading}>Brands</Typography>
               </Grid>
               <Grid item xs={1}>
@@ -117,16 +166,20 @@ const AllPost = (props) => {
                 </div>
               :
                 
-                data !== {} && data.map((item) => {
+                data !== {} && data.map((item, index) => {
+
+                  let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
+
                   return (
                     <div key={item.id}>
                       <Divider className={classes.divider} />
                       <Grid container spacing={1}>
-                        <Grid item xs={1} className={classes.tableCell}>
-                          <img className={classes.postsimage} src={API_URL + item.featured_img} alt="upload" />
+                        <Grid item xs={2} className={classes.tableCell}>
+                          <Checkbox color="primary" checked={checked === index} onChange={() => handleChange(index, item)} />
+                          <img className={classes.postsimage} src={image} alt="upload" />
                         </Grid>
                         <Grid item xs={3} className={classes.tableCell}>
-                          <Typography variant="body1" className={classes.pointer} gutterBottom onClick={() => history.push('/dahboard/view-post/' + item.id)}>
+                          <Typography variant="body1" className={classes.pointer} gutterBottom onClick={() => history.push('/dashboard/view-news/' + item.id)}>
                             {item.title}
                           </Typography>
                         </Grid>
@@ -137,7 +190,7 @@ const AllPost = (props) => {
                             })}
                           </div>
                         </Grid>
-                        <Grid item xs={2} className={classes.tableCell}>
+                        <Grid item xs={1} className={classes.tableCell}>
                           <div className={classes.chips}>
                             {(item.brands).map((chip) => {
                               return <Chip key={chip} label={chip} size="small" color="primary" variant="outlined" />
@@ -159,7 +212,7 @@ const AllPost = (props) => {
                             <Button variant="contained" size="small" color="secondary" onClick={() => handleEdit(item.id)}>
                               Delete
                             </Button>
-                            <Button variant="contained" size="small" color="primary" onClick={() => history.push('/dashboard/edit-post/' + item.id)}>
+                            <Button variant="contained" size="small" color="primary" onClick={() => history.push('/dashboard/edit-news/' + item.id)}>
                               Edit
                             </Button>
                           </div>
@@ -177,7 +230,7 @@ const AllPost = (props) => {
                 renderItem={(item) => (
                   <PaginationItem
                     component={Link}
-                    to={`/dashboard/all-post${item.page === 1 ? '' : `?page=${item.page}&size=${pageSize}`}`}
+                    to={`/dashboard/all-news${item.page === 1 ? '' : `?page=${item.page}&size=${pageSize}`}`}
                     {...item}
                   />
                 )}
@@ -223,6 +276,27 @@ const AllPost = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Are you sure to send notification?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Sending notification is irreversable.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setNotificationOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSendNotification} color="primary" autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   )
 }
@@ -231,4 +305,4 @@ const mapStateToProps = (state) => {
   return state.common.userData;
 };
 
-export default connect(mapStateToProps)(AllPost);
+export default connect(mapStateToProps)(AllNews);

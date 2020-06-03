@@ -19,10 +19,12 @@ import Pagination from '@material-ui/lab/Pagination';
 import PaginationItem from '@material-ui/lab/PaginationItem';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import style from './style';
 import GetAllPdf from '../../api/pdf/getAllPdf';
 import deletePdf from '../../api/pdf/deletePdf';
+import addNotification from '../../api/notification/addNotification';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
@@ -40,6 +42,24 @@ const AllPdf = (props) => {
   const [pageSizeOpen, setPageSizeOpen] = React.useState(false);
   const query = new URLSearchParams(location.search);
   const page = parseInt(query.get('page') || '1', 10);
+
+  const [notificationOpen, setNotificationOpen] = React.useState(false);
+  const [checked, setChecked] = React.useState(false);
+  const [checkedData, setCheckedData] = React.useState(
+    {
+      "priority": "high",
+      "notification" : {
+        "title": "",
+        "body": "மேலும் படிக்க கிளிக் செய்யவும்",
+        "image": ""
+      },
+      "data":{
+        "type": "pdf",
+        "display": "full",
+        "id": "",
+      }
+    }
+  );
   
 
   React.useEffect(() => {
@@ -79,15 +99,46 @@ const AllPdf = (props) => {
     setTotalPages(response.pagination.totalPages);
     setLoading(false);
   }
+
+  const handleSendNotification = async () => {
+    const response = await addNotification(checkedData, props.token);
+    setNotificationOpen(false);
+    if(response.status === 200){
+      SnackMessage({ status: response.status, msg: response.message });
+    }
+  }
+
+  const handleChange = (index, item) => {
+    setChecked(index);
+    let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
+    setCheckedData({
+      ...checkedData, 
+      notification:{
+        ...checkedData.notification,
+        title: item.title,
+        image: image,
+      },
+      data:{
+        ...checkedData.data,
+        id: item.id,
+        url: item.url
+      }
+    })
+  };
   
   return (
     <React.Fragment>
       <CssBaseline />
+      <div className={classes.notificationContainer}>
+        <Button variant="contained" size="small" color="primary" onClick={() => setNotificationOpen(true)} disabled={checked === false ? true : false}>
+          Send Notification
+        </Button>
+      </div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
           <Grid container spacing={1}>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Image</Typography>
               </Grid>
               <Grid item xs={3}>
@@ -96,7 +147,7 @@ const AllPdf = (props) => {
               <Grid item xs={2}>
                 <Typography variant="body1" className={classes.tableHeading}>Categories</Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <Typography variant="body1" className={classes.tableHeading}>Brands</Typography>
               </Grid>
               <Grid item xs={1}>
@@ -117,13 +168,17 @@ const AllPdf = (props) => {
                 </div>
               :
                 
-                data !== {} && data.map((item) => {
+                data !== {} && data.map((item, index) => {
+
+                  let image = (/http/ig).test(item.featured_img) === true ? item.featured_img : API_URL + item.featured_img;
+
                   return (
                     <div key={item.id}>
                       <Divider className={classes.divider} />
                       <Grid container spacing={1}>
-                        <Grid item xs={1} className={classes.tableCell}>
-                          <img className={classes.postsimage} src={API_URL + item.featured_img} alt="upload" />
+                        <Grid item xs={2} className={classes.tableCell}>
+                          <Checkbox color="primary" checked={checked === index} onChange={() => handleChange(index, item)} />
+                          <img className={classes.postsimage} src={image} alt="upload" />
                         </Grid>
                         <Grid item xs={3} className={classes.tableCell}>
                           <Typography variant="body1" className={classes.pointer} gutterBottom onClick={() => history.push('/dahboard/view-pdf/' + item.id)}>
@@ -137,7 +192,7 @@ const AllPdf = (props) => {
                             })}
                           </div>
                         </Grid>
-                        <Grid item xs={2} className={classes.tableCell}>
+                        <Grid item xs={1} className={classes.tableCell}>
                           <div className={classes.chips}>
                             {(item.brands).map((chip) => {
                               return <Chip key={chip} label={chip} size="small" color="primary" variant="outlined" />
@@ -219,6 +274,27 @@ const AllPdf = (props) => {
             Cancel
           </Button>
           <Button onClick={handleDelete} color="primary" autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Are you sure to send notification?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Sending notification is irreversable.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setNotificationOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSendNotification} color="primary" autoFocus>
             Ok
           </Button>
         </DialogActions>

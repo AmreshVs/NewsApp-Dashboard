@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { API_URL } from '../../constants/index';
 
-const GetPost = async (id, token) => {  
+const GetAllNews = async (page, size, token) => {  
   return await axios({
     method: 'GET',
-    url: API_URL + '/get-post?id=' + id,
+    url: `${API_URL}/get-all-news?page=${page}&size=${size}`,
     headers: {
       'Authorization': token,
     },
@@ -17,4 +17,4 @@ const GetPost = async (id, token) => {
   });
 }
 
-export default GetPost;
+export default GetAllNews;

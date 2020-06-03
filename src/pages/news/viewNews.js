@@ -13,12 +13,12 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 
 import style from './style';
-import GetPost from '../../api/post/getPost';
+import GetNews from '../../api/news/getNews';
 import AddComment from '../../api/addComment';
 import { API_URL } from '../../constants/index';
 import SnackMessage from '../../commonFunctions/SnackMessage';
 
-const ViewPost = (props) => {
+const ViewNews = (props) => {
 
   const classes = style();
   const { post_id } = useParams();
@@ -30,7 +30,7 @@ const ViewPost = (props) => {
 
   React.useEffect(() => {
     const loadData = async () => {
-      let response = await GetPost(post_id, props.token);
+      let response = await GetNews(post_id, props.token);
       setData(response.data);
       setLoading(false);
     }
@@ -148,4 +148,4 @@ const mapStateToProps = (state) => {
   return state.common.userData;
 }
 
-export default connect(mapStateToProps)(ViewPost);
+export default connect(mapStateToProps)(ViewNews);

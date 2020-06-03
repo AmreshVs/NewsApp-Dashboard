@@ -1,12 +1,13 @@
 import axios from 'axios';
-import { API_URL } from '../../constants/index';
+import { API_URL } from '../constants/index';
 
-const DeletePost = async (id, token) => {  
+const GetSummary = async (token) => {  
   return await axios({
     method: 'GET',
-    url: API_URL + '/delete-post?id=' + id,
+    url: API_URL + '/summary',
     headers: {
       'Authorization': token,
+      'Content-Type': 'application/json'
     },
   })
   .then(function (response) {
@@ -17,4 +18,4 @@ const DeletePost = async (id, token) => {
   });
 }
 
-export default DeletePost;
+export default GetSummary;

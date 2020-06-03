@@ -60,8 +60,8 @@ const Dashboard = (props) => {
 
   const navLinks = [
     { id: 1, title: 'Home', url: url, icon: <HomeIcon/>, divider: true },
-    { id: 2, title: 'Add Post', url: `${url}/add-post`, icon: <PostAddIcon/> },
-    { id: 3, title: 'All Post', url: `${url}/all-post`, icon: <ViewStreamIcon/>, divider: true },
+    { id: 2, title: 'Add News', url: `${url}/add-news`, icon: <PostAddIcon/> },
+    { id: 3, title: 'All News', url: `${url}/all-news`, icon: <ViewStreamIcon/>, divider: true },
     { id: 4, title: 'Add Pdf', url: `${url}/add-pdf`, icon: <BookIcon/> },
     { id: 5, title: 'All Pdf', url: `${url}/all-pdf`, icon: <AmpStoriesIcon/>, divider: true },
     { id: 6, title: 'Add Video', url: `${url}/add-video`, icon: <VideoLabelIcon/> },

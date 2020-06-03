@@ -27,7 +27,7 @@ const style = makeStyles((theme) => ({
     cursor: 'pointer'
   },
   postsimage:{
-    width: '100%',
+    width: '50%',
     borderRadius: 5,
     maxHeight: 70
   },
@@ -56,7 +56,7 @@ const style = makeStyles((theme) => ({
   tableCell:{
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'space-around'
   },
   divider:{
     margin: '10px 0px'
@@ -97,6 +97,20 @@ const style = makeStyles((theme) => ({
     '&:hover':{
       color: theme.palette.primary.main
     },
+  },
+  notificationContainer:{
+    textAlign: 'right',
+    marginBottom: 10
+  },
+  formControlSelect: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  dialogContent:{
+    textAlign: 'center'
   }
 }));
 

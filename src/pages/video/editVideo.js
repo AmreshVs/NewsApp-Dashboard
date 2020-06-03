@@ -74,7 +74,8 @@ const EditVideo = (props) => {
     setTags(tags);
     setVideoUrl(url);
     setVideoFlag(!url.includes('http') || false);
-    setImage(featured_img);
+    let image = (/http/ig).test(featured_img) === true ? featured_img : API_URL + featured_img;
+    setImage(image);
     setCategoriesChecked(categories_array);
     setBrandsChecked(brands_array);
   }
@@ -274,7 +275,7 @@ const EditVideo = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={title !== '' ? API_URL + image : image} alt="upload" />
+                  <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
                   <input
                     accept="image/*"
                     className={classes.input}

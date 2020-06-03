@@ -27,9 +27,9 @@ const style = makeStyles((theme) => ({
     cursor: 'pointer'
   },
   postsimage:{
-    width: '100%',
+    width: '50%',
     borderRadius: 5,
-    maxHeight: 70
+    maxHeight: 150
   },
   button:{
     width: '100%'
@@ -97,6 +97,10 @@ const style = makeStyles((theme) => ({
     '&:hover':{
       color: theme.palette.primary.main
     },
+  },
+  notificationContainer:{
+    textAlign: 'right',
+    marginBottom: 10
   }
 }));
 
