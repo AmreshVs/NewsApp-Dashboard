@@ -49,15 +49,15 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published News
               </Typography>
-              {state.data.news.length === 0 && 
-                <Typography variant="p" gutterBottom>
+              {state.data !== undefined && state.data.news.length === 0 && 
+                <Typography variant="body1" gutterBottom>
                   No News's yet!
                 </Typography>
               }
               {state.data.news.length > 0 && state.data.news.map((news) => {
                 let image = (/http/ig).test(news.featured_img) === true ? news.featured_img : API_URL + news.featured_img;
                 return(
-                  <>
+                  <div key={news.id}>
                     <Grid container spacing={2}>
                       <Grid item xs={2}>
                         <img className={classes.image} src={image} alt='img' />
@@ -66,13 +66,13 @@ const Summary = ({ token }) => {
                         <Typography className={classes.pointer} variant="body2" onClick={() => history.push('/dashboard/view-news/' + news.id)}>
                           {news.title}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          <Box color="text.secondary">{moment(news.posted_on).fromNow()}</Box>
+                        <Typography variant="caption" color="textSecondary">
+                          <Box color="textSecondary">{moment(news.posted_on).fromNow()}</Box>
                         </Typography>
                       </Grid>
                     </Grid>
                     <Divider className={classes.divider} />
-                  </> 
+                  </div> 
                 )
               })}
             </Paper>
@@ -82,15 +82,15 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published Videos
               </Typography>
-              {state.data.videos.length === 0 && 
-                <Typography variant="p" gutterBottom>
+              {state.data !== undefined && state.data.videos.length === 0 && 
+                <Typography variant="body1" gutterBottom>
                   No Videos's yet!
                 </Typography>
               }
               {state.data.videos.length > 0 && state.data.videos.map((video) => {
                 let image = (/http/ig).test(video.featured_img) === true ? video.featured_img : API_URL + video.featured_img;
                 return(
-                  <>
+                  <div key={video.id}>
                     <Grid container spacing={2}>
                       <Grid item xs={2}>
                         <img className={classes.image} src={image} alt='img' />
@@ -99,13 +99,13 @@ const Summary = ({ token }) => {
                         <Typography variant="body2" className={classes.pointer} onClick={() => history.push('/dashboard/view-video/' + video.id)}>
                           {video.title}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          <Box color="text.secondary">{moment(video.posted_on).fromNow()}</Box>
+                        <Typography variant="caption" color="textSecondary">
+                          <Box color="textSecondary">{moment(video.posted_on).fromNow()}</Box>
                         </Typography>
                       </Grid>
                     </Grid>
                     <Divider className={classes.divider} />
-                  </>
+                  </div>
                 )
               })}
             </Paper>
@@ -115,15 +115,15 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published PDF's
               </Typography>
-              {state.data.pdfs.length === 0 && 
-                <Typography variant="p" gutterBottom>
+              {state.data !== undefined && state.data.pdfs.length === 0 && 
+                <Typography variant="body1" gutterBottom>
                   No PDF's yet!
                 </Typography>
               }
               {state.data.pdfs.length > 0 && state.data.pdfs.map((pdf) => {
                 let image = (/http/ig).test(pdf.featured_img) === true ? pdf.featured_img : API_URL + pdf.featured_img;
                 return(
-                  <>
+                  <div key={pdf.id}>
                     <Grid container spacing={2}>
                       <Grid item xs={2}>
                         <img className={classes.imagePdf} src={image} alt='img' />
@@ -132,13 +132,13 @@ const Summary = ({ token }) => {
                         <Typography variant="body2" className={classes.pointer} onClick={() => history.push('/dashboard/view-pdf/' + pdf.id)}>
                           {pdf.title}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          <Box color="text.secondary">{moment(pdf.posted_on).fromNow()}</Box>
+                        <Typography variant="caption" color="textSecondary">
+                          <Box color="textSecondary">{moment(pdf.posted_on).fromNow()}</Box>
                         </Typography>
                       </Grid>
                     </Grid>
                     <Divider className={classes.divider} />
-                  </>
+                  </div>
                 )
               })}
             </Paper>
@@ -148,14 +148,14 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Latest Comments
               </Typography>
-              {state.data.comments.length === 0 && 
-                <Typography variant="p" gutterBottom>
+              {state.data !== undefined && state.data.comments.length === 0 && 
+                <Typography variant="body1" gutterBottom>
                   No Comments yet!
                 </Typography>
               }
-              {state.data.comments.length > 0 && state.data.comments.map((comment) => {
+              {state.data.comments.length > 0 && state.data.comments.map((comment, index) => {
                 return(
-                  <>
+                  <div key={index}>
                     <Grid container spacing={2} className={classes.divider}>
                       <Grid item xs={1}>
                         <Avatar>U{comment.id}</Avatar>
@@ -164,13 +164,13 @@ const Summary = ({ token }) => {
                         <Typography variant="body2">
                           {comment.comment}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          <Box color="text.secondary">{moment(comment.posted_on).fromNow()}</Box>
+                        <Typography variant="caption" color="textSecondary">
+                          <Box color="textSecondary">{moment(comment.posted_on).fromNow()}</Box>
                         </Typography>
                       </Grid>
                     </Grid>
                     <Divider className={classes.divider} />
-                  </>
+                  </div>
                 )
               })}
             </Paper>

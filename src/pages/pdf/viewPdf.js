@@ -72,9 +72,9 @@ const ViewPdf = (props) => {
           </div>
         :
           <div>
-            <img className={classes.image} alt="featured" src={API_URL + data.featured_img} />
+            <img className={classes.image} alt="featured" src={(/http/ig).test(data.featured_img) === false ? API_URL + data.featured_img : data.featured_img} />
             <Typography variant="h5">{data.title}</Typography>
-            <object width="100%" height={600} data={API_URL + data.url} aria-label="pdf" />
+            <object width="100%" height={600} data={(/http/ig).test(data.url) === false ? API_URL + data.url : data.url} aria-label="pdf" />
             <Typography variant="h6" className={classes.commentHeading}>Comments</Typography>
             <Divider />
             {data.comments.map((item, index) => {

@@ -38,8 +38,8 @@ const Login = (props) => {
 
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
-  const [username, setUsername] = React.useState('amresh');
-  const [pass, setPass] = React.useState('amresh');
+  const [username, setUsername] = React.useState('');
+  const [pass, setPass] = React.useState('');
   const [checked, setChecked] = React.useState(true);
 
   const handleChange = (event) => {

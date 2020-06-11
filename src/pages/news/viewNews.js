@@ -73,7 +73,7 @@ const ViewNews = (props) => {
           </div>
         :
           <div>
-            <img className={classes.image} alt="featured" src={API_URL + data.featured_img} />
+            <img className={classes.image} alt="featured" src={(/http/ig).test(data.featured_img) === false ? API_URL + data.featured_img : data.featured_img} />
             <Typography variant="h5">{data.title}</Typography>
             <div>{ ReactHtmlParser(data.content) }</div>
             <Typography variant="h6" className={classes.commentHeading}>Comments</Typography>
