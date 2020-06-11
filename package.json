@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://dev.kaalaimani.com",
   "dependencies": {
     "@babel/core": "7.9.0",
     "@babel/plugin-transform-react-jsx": "^7.9.4",

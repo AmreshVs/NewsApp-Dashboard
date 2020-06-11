@@ -25,13 +25,14 @@ const Summary = ({ token }) => {
   });
 
   React.useEffect(() => {
-    loadData();
-  }, []);
 
-  const loadData = async () => {
-    const response = await GetSummary(token);
-    setState({ ...state, data: response.data, loading: false });
-  }
+    async function loadData(){
+      const response = await GetSummary(token);
+      setState({ ...state, data: response.data, loading: false });
+    }
+
+    loadData();
+  }, [state, token]);
 
   return (
     state.loading === true 
@@ -48,6 +49,11 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published News
               </Typography>
+              {state.data.news.length === 0 && 
+                <Typography variant="p" gutterBottom>
+                  No News's yet!
+                </Typography>
+              }
               {state.data.news.length > 0 && state.data.news.map((news) => {
                 let image = (/http/ig).test(news.featured_img) === true ? news.featured_img : API_URL + news.featured_img;
                 return(
@@ -76,6 +82,11 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published Videos
               </Typography>
+              {state.data.videos.length === 0 && 
+                <Typography variant="p" gutterBottom>
+                  No Videos's yet!
+                </Typography>
+              }
               {state.data.videos.length > 0 && state.data.videos.map((video) => {
                 let image = (/http/ig).test(video.featured_img) === true ? video.featured_img : API_URL + video.featured_img;
                 return(
@@ -104,6 +115,11 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Last Published PDF's
               </Typography>
+              {state.data.pdfs.length === 0 && 
+                <Typography variant="p" gutterBottom>
+                  No PDF's yet!
+                </Typography>
+              }
               {state.data.pdfs.length > 0 && state.data.pdfs.map((pdf) => {
                 let image = (/http/ig).test(pdf.featured_img) === true ? pdf.featured_img : API_URL + pdf.featured_img;
                 return(
@@ -132,6 +148,11 @@ const Summary = ({ token }) => {
               <Typography variant="h6" gutterBottom>
                 Latest Comments
               </Typography>
+              {state.data.comments.length === 0 && 
+                <Typography variant="p" gutterBottom>
+                  No Comments yet!
+                </Typography>
+              }
               {state.data.comments.length > 0 && state.data.comments.map((comment) => {
                 return(
                   <>

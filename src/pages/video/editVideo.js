@@ -32,7 +32,7 @@ const EditVideo = (props) => {
   const [description, setDescription] = React.useState('');
   const [tags, setTags] = React.useState('');
   const [image, setImage] = React.useState(require('../../img/img-placeholder.jpg'));
-  const [imageFlag, setImageFlag] = React.useState(false);
+  // const [imageFlag, setImageFlag] = React.useState(false);
   const [videoFlag, setVideoFlag] = React.useState(false);
   const [brandsChecked, setBrandsChecked] = React.useState([]);
   const [brands, setBrands] = React.useState({});
@@ -143,9 +143,8 @@ const EditVideo = (props) => {
     setVideoFlag(false)
   }
 
-  const handleFileInput = async (image) => {
-    setImageFlag(true);
-    const response = await ImageUpload(image, props.userData.token);
+  const handleFileInput = async (selectedImage) => {
+    const response = await ImageUpload(selectedImage, props.userData.token);
     setImage(response.url);
   }
 

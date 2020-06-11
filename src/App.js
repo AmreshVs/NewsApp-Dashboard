@@ -18,6 +18,9 @@ function App(props) {
       createMuiTheme({
         palette: {
           type: props.theme,
+          primary:{
+            main: '#4901A7',
+          }
         },
       }),
     [props.theme],
