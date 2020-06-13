@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import { useParams, useHistory } from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import CKEditor from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
@@ -60,6 +61,8 @@ const EditNews = (props) => {
   const [brands, setBrands] = React.useState({});
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
   const [categories, setCategories] = React.useState({});
+  const [upload, setUpload] = React.useState(false);
+  const [loading, setLoading] =  React.useState(true);
   const fileInput = React.createRef();
 
   React.useEffect(() => {
@@ -70,6 +73,7 @@ const EditNews = (props) => {
       setBrands(brands_response);
       const post_response = await GetNews(post_id, props.userData.token);
       updateData(post_response.data);
+      setLoading(false);
     }
     loadData();
   }, [props.userData.token, post_id])
@@ -120,8 +124,10 @@ const EditNews = (props) => {
   }
 
   const handleFileInput = async (image) => {
+    setUpload(true);
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
+    setUpload(false);
   }
 
   const validateData = () => {
@@ -177,6 +183,12 @@ const EditNews = (props) => {
   return (
     <React.Fragment>
       <CssBaseline />
+      {loading === true 
+      ? 
+      <div className={classes.loading}>
+        <CircularProgress  />
+      </div>
+      :
       <Grid container spacing={3}>
         <Grid item xs={9}>
           <Grid container spacing={3}>
@@ -235,7 +247,13 @@ const EditNews = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                  {upload === false ? 
+                    <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                    :
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                  }
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -307,6 +325,7 @@ const EditNews = (props) => {
           </Grid>
         </Grid>
       </Grid>
+    }
     </React.Fragment>
   )
 }

@@ -25,14 +25,13 @@ const Summary = ({ token }) => {
   });
 
   React.useEffect(() => {
-
-    async function loadData(){
-      const response = await GetSummary(token);
-      setState({ ...state, data: response.data, loading: false });
-    }
-
     loadData();
-  }, [state, token]);
+  }, []);
+
+  async function loadData(){
+    const response = await GetSummary(token);
+    setState({ ...state, data: response.data, loading: false });
+  }
 
   return (
     state.loading === true 

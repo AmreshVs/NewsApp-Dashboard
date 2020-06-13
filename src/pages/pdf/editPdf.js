@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import { useParams, useHistory } from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import style from './style';
 import PdfUpload from '../../api/pdf/pdfUpload';
@@ -37,6 +38,9 @@ const EditPdf = (props) => {
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
   const [categories, setCategories] = React.useState({});
   const [pdfUrl, setPdfUrl] = React.useState('');
+  const [upload, setUpload] = React.useState(false);
+  const [pdfUpload, setPdfUpload] = React.useState(false);
+  const [loading, setLoading] =  React.useState(true);
   const fileInput = React.createRef();
   const pdfFileInput = React.createRef();
 
@@ -48,6 +52,7 @@ const EditPdf = (props) => {
       setBrands(brands_response);
       const post_response = await GetPdf(pdf_id, props.userData.token);
       updateData(post_response.data);
+      setLoading(false);
     }
     loadData();
   }, [props.userData.token, pdf_id])
@@ -133,14 +138,18 @@ const EditPdf = (props) => {
   }
 
   const handleFileInput = async (image) => {
+    setUpload(true);
     setImageFlag(true);
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
+    setUpload(false);
   }
 
   const handlePdfUpload = async (pdf) => {
+    setPdfUpload(true);
     const response = await PdfUpload(pdf, props.userData.token);
     setPdfUrl(response.url);
+    setPdfUpload(false);
   }
 
   const handleUpdate = async () => {
@@ -155,6 +164,12 @@ const EditPdf = (props) => {
   return (
     <React.Fragment>
       <CssBaseline />
+      {loading === true 
+      ? 
+      <div className={classes.loading}>
+        <CircularProgress  />
+      </div>
+      :
       <Grid container spacing={3}>
         <Grid item xs={9}>
           <Grid container spacing={3}>
@@ -186,7 +201,13 @@ const EditPdf = (props) => {
                   }}
                 />
                 <Grid item xs={12} className={classes.pdfContainer}>
-                  {pdfUrl !== '' ? <object width="100%" height="600" data={pdfUrl !== '' ? API_URL + pdfUrl : ''} type="application/pdf" aria-label="pdf"/> : null}
+                  {pdfUpload === true ? 
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                    :
+                    pdfUrl !== '' ? <object width="100%" height="600" data={pdfUrl !== '' ? API_URL + pdfUrl : ''} type="application/pdf" aria-label="pdf"/> : null
+                  }
                   <label htmlFor="pdf-upload">
                     <input
                       accept="pdf/*"
@@ -234,7 +255,13 @@ const EditPdf = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                  {upload === false ? 
+                    <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                    :
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                  }
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -306,6 +333,7 @@ const EditPdf = (props) => {
           </Grid>
         </Grid>
       </Grid>
+    }
     </React.Fragment>
   )
 }

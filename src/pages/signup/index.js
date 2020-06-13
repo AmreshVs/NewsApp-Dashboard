@@ -47,7 +47,6 @@ const Signup = (props) => {
     if(validate()){
       setLoading(true);
       const response = await ASignup({username: username, email: email, pass: pass});
-      console.log(response)
       SnackMessage({status: response.status, msg: response.message});
       if(response.status === 200){
         props.history.replace('/login');

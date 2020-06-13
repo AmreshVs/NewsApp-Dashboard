@@ -12,6 +12,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import SyncIcon from '@material-ui/icons/Sync';
 import { useHistory } from "react-router-dom";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { API_URL } from '../../constants/index';
 import style from './style';
@@ -38,6 +39,9 @@ const AddVideo = (props) => {
   const [categories, setCategories] = React.useState({});
   const [videoUrl, setVideoUrl] = React.useState('');
   const [videoLink, setVideoLink] = React.useState(''); //http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
+  const [upload, setUpload] = React.useState(false);
+  const [videoUpload, setVideoUpload] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const fileInput = React.createRef();
   const videoFileInput = React.createRef();
 
@@ -47,6 +51,7 @@ const AddVideo = (props) => {
       const brands_response = await GetBrands(props.userData.token);
       setCategories(categories_response);
       setBrands(brands_response);
+      setLoading(false);
     }
     loadData();
   }, [props.userData.token])
@@ -76,15 +81,19 @@ const AddVideo = (props) => {
   }
 
   const handleFileInput = async (image) => {
+    setUpload(true);
     setImageFlag(true);
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
+    setUpload(false);
   }
 
   const handleVideoUpload = async (video) => {
+    setVideoUpload(true);
     const response = await VideoUpload(video, props.userData.token);
     setVideoUrl(response.url);
     setVideoFlag(true);
+    setVideoUpload(false);
   }
 
   const validateData = () => {
@@ -133,6 +142,12 @@ const AddVideo = (props) => {
   return (
     <React.Fragment>
       <CssBaseline />
+      {loading === true 
+      ? 
+      <div className={classes.loading}>
+        <CircularProgress  />
+      </div>
+      :
       <Grid container spacing={3}>
         <Grid item xs={9}>
           <Grid container spacing={3}>
@@ -165,7 +180,13 @@ const AddVideo = (props) => {
                   }}
                 />
                 <Grid item xs={12} className={classes.pdfContainer}>
-                  {videoUrl !== '' ? <video width="100%" height="600" controls={true} src={videoFlag === true ? API_URL + videoUrl : videoUrl} aria-label="mp4"/> : null}
+                  {videoUpload === true ? 
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                    :
+                    videoUrl !== '' ? <video width="100%" height="600" controls={true} src={videoFlag === true ? API_URL + videoUrl : videoUrl} aria-label="mp4"/> : null
+                  }
                   <label htmlFor="video-upload">
                     <input
                       accept="video/*"
@@ -242,7 +263,13 @@ const AddVideo = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
+                  {upload === false ? 
+                    <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
+                    :
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                  }
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -313,6 +340,7 @@ const AddVideo = (props) => {
           </Grid>
         </Grid>
       </Grid>
+    }
     </React.Fragment>
   )
 }

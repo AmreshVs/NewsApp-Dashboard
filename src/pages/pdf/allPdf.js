@@ -188,14 +188,14 @@ const AllPdf = (props) => {
                         <Grid item xs={2} className={classes.tableCell}>
                           <div className={classes.chips}>
                             {(item.categories).map((chip) => {
-                              return <Chip key={chip} label={chip} size="small" color="primary" variant="outlined" />
+                              return <Chip key={chip} label={chip} size="small" variant="outlined" />
                             })}
                           </div>
                         </Grid>
                         <Grid item xs={1} className={classes.tableCell}>
                           <div className={classes.chips}>
                             {(item.brands).map((chip) => {
-                              return <Chip key={chip} label={chip} size="small" color="primary" variant="outlined" />
+                              return <Chip key={chip} label={chip} size="small" variant="outlined" />
                             })}
                           </div>
                         </Grid>

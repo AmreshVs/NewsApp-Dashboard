@@ -101,6 +101,16 @@ const style = makeStyles((theme) => ({
   notificationContainer:{
     textAlign: 'right',
     marginBottom: 10
+  },
+  uploader:{
+    minHeight: 400,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  loading:{
+    display: 'flex',
+    justifyContent: 'center',
   }
 }));
 

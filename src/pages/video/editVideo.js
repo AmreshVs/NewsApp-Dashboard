@@ -12,6 +12,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import SyncIcon from '@material-ui/icons/Sync';
 import { useParams, useHistory } from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import style from './style';
 import VideoUpload from '../../api/video/videoUpload';
@@ -40,6 +41,9 @@ const EditVideo = (props) => {
   const [categories, setCategories] = React.useState({});
   const [videoUrl, setVideoUrl] = React.useState('');
   const [videoLink, setVideoLink] = React.useState('');
+  const [upload, setUpload] = React.useState(false);
+  const [videoUpload, setVideoUpload] = React.useState(false);
+  const [loading, setLoading] =  React.useState(true);
   const fileInput = React.createRef();
   const pdfFileInput = React.createRef();
 
@@ -51,6 +55,7 @@ const EditVideo = (props) => {
       setBrands(brands_response);
       const post_response = await GetVideo(video_id, props.userData.token);
       updateData(post_response.data);
+      setLoading(false);
     }
     loadData();
   }, [props.userData.token, video_id])
@@ -139,19 +144,25 @@ const EditVideo = (props) => {
   }
 
   const handleParse = () => {
+    setVideoUpload(true);
     setVideoUrl(videoLink);
-    setVideoFlag(false)
+    setVideoFlag(false);
+    setVideoFlag(false);
   }
 
-  const handleFileInput = async (selectedImage) => {
-    const response = await ImageUpload(selectedImage, props.userData.token);
+  const handleFileInput = async (image) => {
+    setUpload(true);
+    const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
+    setUpload(false);
   }
 
-  const handleVideoUpload = async (pdf) => {
-    const response = await VideoUpload(pdf, props.userData.token);
+  const handleVideoUpload = async (video) => {
+    setVideoUpload(true);
+    const response = await VideoUpload(video, props.userData.token);
     setVideoUrl(response.url);
     setVideoFlag(true);
+    setVideoUpload(false);
   }
 
   const handleUpdate = async () => {
@@ -166,12 +177,18 @@ const EditVideo = (props) => {
   return (
     <React.Fragment>
       <CssBaseline />
+      {loading === true 
+      ? 
+      <div className={classes.loading}>
+        <CircularProgress  />
+      </div>
+      :
       <Grid container spacing={3}>
         <Grid item xs={9}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <h3 className={classes.heading}>Edit Pdf</h3>
+                <h3 className={classes.heading}>Edit Video</h3>
                 <TextField
                   id="standard-full-width"
                   variant="outlined"
@@ -197,7 +214,13 @@ const EditVideo = (props) => {
                   }}
                 />
                 <Grid item xs={12} className={classes.pdfContainer}>
-                {videoUrl !== '' ? <video width="100%" height="600" controls={true} src={videoFlag === true ? API_URL + videoUrl : videoUrl} aria-label="mp4"/> : null}
+                  {videoUpload === true ? 
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                    :
+                    videoUrl !== '' ? <video width="100%" height="600" controls={true} src={videoFlag === true ? API_URL + videoUrl : videoUrl} aria-label="mp4"/> : null
+                  }
                   <label htmlFor="pdf-upload">
                     <input
                       accept="pdf/*"
@@ -274,7 +297,13 @@ const EditVideo = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                  {upload === false ? 
+                    <img className={classes.image} src={title !== '' && (/http/ig).test(image) === false ? API_URL + image : image} alt="upload" />
+                    :
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                  }
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -346,6 +375,7 @@ const EditVideo = (props) => {
           </Grid>
         </Grid>
       </Grid>
+    }
     </React.Fragment>
   )
 }

@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CheckIcon from '@material-ui/icons/Check';
 import { useHistory } from "react-router-dom";
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { API_URL } from '../../constants/index';
 
 import CKEditor from "@ckeditor/ckeditor5-react";
@@ -59,6 +61,8 @@ const NewNews = (props) => {
   const [brands, setBrands] = React.useState({});
   const [categoriesChecked, setCategoriesChecked] = React.useState([]);
   const [categories, setCategories] = React.useState({});
+  const [upload, setUpload] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const fileInput = React.createRef();
 
   React.useEffect(() => {
@@ -67,6 +71,7 @@ const NewNews = (props) => {
       const brands_response = await GetBrands(props.userData.token);
       setCategories(categories_response);
       setBrands(brands_response);
+      setLoading(false);
     }
     loadData();
   }, [props.userData.token])
@@ -96,9 +101,11 @@ const NewNews = (props) => {
   }
 
   const handleFileInput = async (image) => {
+    setUpload(true);
     setImageFlag(true);
     const response = await ImageUpload(image, props.userData.token);
     setImage(response.url);
+    setUpload(false);
   }
 
   const validateData = () => {
@@ -159,6 +166,12 @@ const NewNews = (props) => {
   return (
     <React.Fragment>
       <CssBaseline />
+      {loading === true 
+      ? 
+      <div className={classes.loading}>
+        <CircularProgress  />
+      </div>
+      :
       <Grid container spacing={3}>
         <Grid item xs={9}>
           <Grid container spacing={3}>
@@ -217,7 +230,13 @@ const NewNews = (props) => {
               <Paper className={classes.paper}>
                 <h3 className={classes.heading}>Featured Image</h3>
                 <label htmlFor="contained-button-file">
-                  <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
+                  {upload === false ? 
+                    <img className={classes.image} src={imageFlag ? API_URL + image : image} alt="upload" />
+                    :
+                    <div className={classes.uploader}>
+                      <CircularProgress  />
+                    </div>
+                  }
                   <input
                     accept="image/*"
                     className={classes.input}
@@ -289,6 +308,7 @@ const NewNews = (props) => {
           </Grid>
         </Grid>
       </Grid>
+    }
     </React.Fragment>
   )
 }
